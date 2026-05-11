@@ -12,11 +12,11 @@ function countFilled(obj: Record<string, unknown>): number {
 }
 
 export default function ExportSection({ state }: Props) {
-  const handleExport = async () => {
+  const handleExport = () => {
     const phase = state.patientInfo.assessmentPhase;
     const id = state.patientInfo.id || 'unknown';
     const filename = `${id}__${phase === 'baseline' ? 'baseline' : `phase${phase.replace('m', '').replace('y', '12')}`}_assessment.xlsx`;
-    const wb = await exportAssessment(state);
+    const wb = exportAssessment(state);
     downloadWorkbook(wb, filename);
   };
 
