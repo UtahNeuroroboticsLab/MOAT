@@ -61,10 +61,10 @@ export function createDefaultState(): AssessmentState {
       },
       dates: { initial: '', t2: '' },
     },
-    boxAndBlocks: {
-      withoutMyoPro: { affected: null, unaffected: null, affectedNotes: '', unaffectedNotes: '' },
-      withMyoPro: { affected: null, unaffected: null, affectedNotes: '', unaffectedNotes: '' },
-    },
+    // boxAndBlocks: {
+    //   withoutMyoPro: { affected: null, unaffected: null, affectedNotes: '', unaffectedNotes: '' },
+    //   withMyoPro: { affected: null, unaffected: null, affectedNotes: '', unaffectedNotes: '' },
+    // },
     myomoWithout: {
       tasks: myomoTasks.map(t => ({
         components: t.components.map(() => ({ achieve: 0, time: null })),

@@ -7,7 +7,7 @@ import MAS from './components/MAS';
 import FuglMeyer from './components/FuglMeyer';
 import SIS from './components/SIS';
 import COPM from './components/COPM';
-import BoxAndBlocks from './components/BoxAndBlocks';
+// import BoxAndBlocks from './components/BoxAndBlocks';
 import MyomoTasks from './components/MyomoTasks';
 import CAHAI from './components/CAHAI';
 import NasaTLX from './components/NasaTLX';
@@ -50,7 +50,7 @@ function App() {
       case 'fugl_meyer': return <FuglMeyer data={state.fma} onChange={d => update('fma', d)} />;
       case 'sis': return <SIS data={state.sis} onChange={d => update('sis', d)} />;
       case 'copm': return <COPM data={state.copm} onChange={d => update('copm', d)} />;
-      case 'box_and_blocks': return <BoxAndBlocks data={state.boxAndBlocks} onChange={d => update('boxAndBlocks', d)} affectedHand={state.patientInfo.affectedHand} />;
+      // case 'box_and_blocks': return <BoxAndBlocks data={state.boxAndBlocks} onChange={d => update('boxAndBlocks', d)} affectedHand={state.patientInfo.affectedHand} />;
       case 'myomo_without': return <MyomoTasks data={state.myomoWithout} onChange={d => update('myomoWithout', d)} variant="without" />;
       case 'myomo_with': return <MyomoTasks data={state.myomoWith} onChange={d => update('myomoWith', d)} variant="with" />;
       case 'cahai_without': return <CAHAI data={state.cahaiWithout} onChange={d => update('cahaiWithout', d)} variant="without" />;
