@@ -150,29 +150,7 @@ export async function exportAssessment(state: AssessmentState): Promise<XLSX.Wor
     sc(ws5, 'I13', totalFMA);
   }
 
-  // ========== 6. Box and Blocks ==========
-  // const ws6 = wb.Sheets['6_box_and_blocks'];
-  // if (ws6) {
-  //   sc(ws6, 'B3', state.patientInfo.id);
-  //   sc(ws6, 'D3', formatDate(state.patientInfo.date));
-  //   sc(ws6, 'B4', state.patientInfo.affectedHand);
-  //   sc(ws6, 'A10', formatDate(state.patientInfo.date));
-  //   sc(ws6, 'B10', state.patientInfo.affectedHand);
-  //   if (state.boxAndBlocks.withoutMyoPro.affected !== null) sc(ws6, 'D10', state.boxAndBlocks.withoutMyoPro.affected);
-  //   if (state.boxAndBlocks.withoutMyoPro.affectedNotes) sc(ws6, 'E10', state.boxAndBlocks.withoutMyoPro.affectedNotes);
-  //   sc(ws6, 'A11', formatDate(state.patientInfo.date));
-  //   sc(ws6, 'B11', state.patientInfo.affectedHand === 'Right' ? 'Left' : 'Right');
-  //   if (state.boxAndBlocks.withoutMyoPro.unaffected !== null) sc(ws6, 'D11', state.boxAndBlocks.withoutMyoPro.unaffected);
-  //   if (state.boxAndBlocks.withoutMyoPro.unaffectedNotes) sc(ws6, 'E11', state.boxAndBlocks.withoutMyoPro.unaffectedNotes);
-  //   sc(ws6, 'A15', formatDate(state.patientInfo.date));
-  //   sc(ws6, 'B15', state.patientInfo.affectedHand);
-  //   if (state.boxAndBlocks.withMyoPro.affected !== null) sc(ws6, 'D15', state.boxAndBlocks.withMyoPro.affected);
-  //   if (state.boxAndBlocks.withMyoPro.affectedNotes) sc(ws6, 'E15', state.boxAndBlocks.withMyoPro.affectedNotes);
-  //   sc(ws6, 'A16', formatDate(state.patientInfo.date));
-  //   sc(ws6, 'B16', state.patientInfo.affectedHand === 'Right' ? 'Left' : 'Right');
-  //   if (state.boxAndBlocks.withMyoPro.unaffected !== null) sc(ws6, 'D16', state.boxAndBlocks.withMyoPro.unaffected);
-  //   if (state.boxAndBlocks.withMyoPro.unaffectedNotes) sc(ws6, 'E16', state.boxAndBlocks.withMyoPro.unaffectedNotes);
-  // }
+  // 6. Removed Box & Blocks
 
   // ========== 7a/7b. Myomo Tasks ==========
   function writeMyomoSheet(sheetName: string, taskData: typeof state.myomoWithout) {

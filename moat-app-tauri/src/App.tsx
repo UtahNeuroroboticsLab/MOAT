@@ -7,20 +7,19 @@ import MAS from './components/MAS';
 import FuglMeyer from './components/FuglMeyer';
 import SIS from './components/SIS';
 import COPM from './components/COPM';
-// import BoxAndBlocks from './components/BoxAndBlocks';
 import MyomoTasks from './components/MyomoTasks';
 import CAHAI from './components/CAHAI';
 import NasaTLX from './components/NasaTLX';
 import Notes from './components/Notes';
 import ExportSection from './components/ExportSection';
 
+// This is what causes sections to render or not
 const sections: { id: SectionId; label: string; group?: string }[] = [
   { id: 'patient_info', label: 'Patient Info' },
   { id: 'mas', label: 'MAS / MMT / AROM', group: 'Assessments' },
   { id: 'fugl_meyer', label: 'Fugl-Meyer' },
   { id: 'sis', label: 'Stroke Impact Scale' },
   { id: 'copm', label: 'COPM' },
-  { id: 'box_and_blocks', label: 'Box & Blocks' },
   { id: 'myomo_without', label: 'Myomo Tasks (W/O)', group: 'Without MyoPro' },
   { id: 'cahai_without', label: 'CAHAI (W/O)' },
   { id: 'nasa_without', label: 'NASA TLX (W/O)' },

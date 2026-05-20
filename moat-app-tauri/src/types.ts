@@ -53,11 +53,6 @@ export interface FMAData {
   scores: { [itemId: string]: number | null };
 }
 
-// export interface BoxAndBlocksData {
-//   withoutMyoPro: { affected: number | null; unaffected: number | null; affectedNotes: string; unaffectedNotes: string };
-//   withMyoPro: { affected: number | null; unaffected: number | null; affectedNotes: string; unaffectedNotes: string };
-// }
-
 export interface MyomoTaskComponent {
   achieve: number;  // 0 or 1
   time: number | null;
