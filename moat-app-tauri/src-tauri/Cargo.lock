@@ -2008,7 +2008,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "moat-app-tauri"
+name = "moat-app"
 version = "0.1.0"
 dependencies = [
  "serde",

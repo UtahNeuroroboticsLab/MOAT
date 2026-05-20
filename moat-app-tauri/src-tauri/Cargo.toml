@@ -1,8 +1,8 @@
 [package]
-name = "moat-app-tauri"
+name = "moat-app"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Myoelectric Orthosis Assessment Toolkit"
+authors = ["Leonardo Ferrisi"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

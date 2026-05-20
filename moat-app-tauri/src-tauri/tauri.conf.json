@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "moat-app-tauri",
+  "productName": "moat-app",
   "version": "0.1.0",
   "identifier": "com.leonardo.moat-app-tauri",
   "build": {
@@ -12,9 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "moat-app-tauri",
+        "title": "moat-app",
         "width": 800,
-        "height": 600
+        "height": 650
       }
     ],
     "security": {
