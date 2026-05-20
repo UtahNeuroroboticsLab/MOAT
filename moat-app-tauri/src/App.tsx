@@ -56,7 +56,7 @@ function App() {
       case 'cahai_with': return <CAHAI data={state.cahaiWith} onChange={d => update('cahaiWith', d)} variant="with" />;
       case 'nasa_without': return <NasaTLX data={state.nasaWithout} onChange={d => update('nasaWithout', d)} variant="without" />;
       case 'nasa_with': return <NasaTLX data={state.nasaWith} onChange={d => update('nasaWith', d)} variant="with" />;
-      case 'notes': return <Notes notes={state.sectionNotes} onChange={n => update('sectionNotes', n)} />;
+      case 'notes': return <Notes notes={state.sectionNotes} onChange={n => update('sectionNotes', n)} notRecorded={state.notRecorded} onNotRecordedChange={v => update('notRecorded', v)} />;
       case 'export': return <ExportSection state={state} />;
     }
   };

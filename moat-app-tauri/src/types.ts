@@ -16,6 +16,7 @@ export interface MASData {
     mas: string;   // 0,1,1+,2,3,4 or NT
     mmt: string;   // 0/5..5/5 or NA or NT
     arom: string;  // degrees or NA or NT
+    notes: string;
   }[];
 }
 
@@ -34,6 +35,7 @@ export interface COPMData {
     satT1: number | null;        // 1-10
     perfT2: number | null;       // 1-10
     satT2: number | null;        // 1-10
+    notes: string;
   }[];
   identificationNotes: {
     selfCare: { personalCare: string[]; functionalMobility: string[]; communityMgmt: string[] };
@@ -51,6 +53,7 @@ export interface COPMData {
 export interface FMAData {
   // Each item keyed by ID (A1..A18, B1..B5, C1..C7, D1..D3)
   scores: { [itemId: string]: number | null };
+  sectionNotes: { [sectionTitle: string]: string };
 }
 
 export interface MyomoTaskComponent {
@@ -61,6 +64,7 @@ export interface MyomoTaskComponent {
 export interface MyomoTasksData {
   tasks: {
     components: MyomoTaskComponent[];
+    notes: string;
   }[];
 }
 
@@ -82,6 +86,7 @@ export interface NasaTLXData {
   performance: number | null;
   effort: number | null;
   frustration: number | null;
+  dimensionNotes: { [key: string]: string };
 }
 
 export interface AssessmentState {
@@ -98,6 +103,7 @@ export interface AssessmentState {
   nasaWithout: NasaTLXData;
   nasaWith: NasaTLXData;
   sectionNotes: { [section: string]: string };
+  notRecorded: { [key: string]: boolean };
 }
 
 export type SectionId =

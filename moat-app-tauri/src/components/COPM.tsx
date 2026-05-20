@@ -48,6 +48,7 @@ export default function COPM({ data, onChange }: Props) {
             <th>Sat T1</th>
             <th>Perf T2</th>
             <th>Sat T2</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -84,6 +85,11 @@ export default function COPM({ data, onChange }: Props) {
                   value={p.satT2 ?? ''}
                   onChange={e => updateProblem(i, 'satT2', e.target.value ? parseInt(e.target.value) : null)} />
               </td>
+              <td>
+                <input type="text" value={p.notes ?? ''}
+                  onChange={e => updateProblem(i, 'notes', e.target.value)}
+                  placeholder="Notes..." />
+              </td>
             </tr>
           ))}
           <tr style={{ fontWeight: 600, background: 'var(--bg-alt)' }}>
@@ -92,6 +98,7 @@ export default function COPM({ data, onChange }: Props) {
             <td>{avg('satT1')}</td>
             <td>{avg('perfT2')}</td>
             <td>{avg('satT2')}</td>
+            <td></td>
           </tr>
         </tbody>
       </table>

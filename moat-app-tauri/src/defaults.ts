@@ -14,18 +14,19 @@ export function createDefaultState(): AssessmentState {
     },
     mas: {
       rows: [
-        { joint: 'Shoulder', muscle: 'Flexors', mas: 'NT', mmt: 'NT', arom: '' },
-        { joint: 'Shoulder', muscle: 'Extensors', mas: 'NT', mmt: 'NT', arom: '' },
-        { joint: 'Shoulder', muscle: 'Abductors', mas: 'NT', mmt: 'NT', arom: '' },
-        { joint: 'Elbow', muscle: 'Flexors', mas: '', mmt: '', arom: '' },
-        { joint: 'Elbow', muscle: 'Extensors', mas: '', mmt: '', arom: '' },
-        { joint: 'Wrist', muscle: 'Wrist Flexors', mas: '', mmt: '', arom: '' },
-        { joint: 'Wrist', muscle: 'Wrist Extensors', mas: '', mmt: '', arom: '' },
-        { joint: 'Finger', muscle: 'Finger Flexors', mas: '', mmt: 'NT', arom: 'NT' },
+        { joint: 'Shoulder', muscle: 'Flexors', mas: 'NT', mmt: 'NT', arom: '', notes: '' },
+        { joint: 'Shoulder', muscle: 'Extensors', mas: 'NT', mmt: 'NT', arom: '', notes: '' },
+        { joint: 'Shoulder', muscle: 'Abductors', mas: 'NT', mmt: 'NT', arom: '', notes: '' },
+        { joint: 'Elbow', muscle: 'Flexors', mas: '', mmt: '', arom: '', notes: '' },
+        { joint: 'Elbow', muscle: 'Extensors', mas: '', mmt: '', arom: '', notes: '' },
+        { joint: 'Wrist', muscle: 'Wrist Flexors', mas: '', mmt: '', arom: '', notes: '' },
+        { joint: 'Wrist', muscle: 'Wrist Extensors', mas: '', mmt: '', arom: '', notes: '' },
+        { joint: 'Finger', muscle: 'Finger Flexors', mas: '', mmt: 'NT', arom: 'NT', notes: '' },
       ],
     },
     fma: {
       scores: {},
+      sectionNotes: {},
     },
     sis: {
       domains: {
@@ -48,6 +49,7 @@ export function createDefaultState(): AssessmentState {
         satT1: null,
         perfT2: null,
         satT2: null,
+        notes: '',
       })),
       identificationNotes: {
         selfCare: { personalCare: ['', '', ''], functionalMobility: ['', '', ''], communityMgmt: ['', '', ''] },
@@ -64,11 +66,13 @@ export function createDefaultState(): AssessmentState {
     myomoWithout: {
       tasks: myomoTasks.map(t => ({
         components: t.components.map(() => ({ achieve: 0, time: null })),
+        notes: '',
       })),
     },
     myomoWith: {
       tasks: myomoTasks.map(t => ({
         components: t.components.map(() => ({ achieve: 0, time: null })),
+        notes: '',
       })),
     },
     cahaiWithout: {
@@ -79,8 +83,9 @@ export function createDefaultState(): AssessmentState {
       tasks: cahaiTasks.map(t => ({ role: t.defaultRole, score: 1, comment: '' })),
       generalComment: '',
     },
-    nasaWithout: { mentalDemand: null, physicalDemand: null, temporalDemand: null, performance: null, effort: null, frustration: null },
-    nasaWith: { mentalDemand: null, physicalDemand: null, temporalDemand: null, performance: null, effort: null, frustration: null },
+    nasaWithout: { mentalDemand: null, physicalDemand: null, temporalDemand: null, performance: null, effort: null, frustration: null, dimensionNotes: {} },
+    nasaWith: { mentalDemand: null, physicalDemand: null, temporalDemand: null, performance: null, effort: null, frustration: null, dimensionNotes: {} },
     sectionNotes: {},
+    notRecorded: {},
   };
 }

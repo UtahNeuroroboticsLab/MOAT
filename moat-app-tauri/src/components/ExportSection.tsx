@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AssessmentState } from '../types';
 import { sisDomains } from '../data/sisItems';
 import { fmaSections } from '../data/fmaItems';
@@ -12,12 +13,15 @@ function countFilled(obj: Record<string, unknown>): number {
 }
 
 export default function ExportSection({ state }: Props) {
+  const [savedAs, setSavedAs] = useState<string | null>(null);
+
   const handleExport = async () => {
     const phase = state.patientInfo.assessmentPhase;
     const id = state.patientInfo.id || 'unknown';
     const filename = `${id}__${phase === 'baseline' ? 'baseline' : `phase${phase.replace('m', '').replace('y', '12')}`}_assessment.xlsx`;
     const wb = await exportAssessment(state);
-    downloadWorkbook(wb, filename);
+    await downloadWorkbook(wb, filename);
+    setSavedAs(filename);
   };
 
   // Completion checks
@@ -95,6 +99,21 @@ export default function ExportSection({ state }: Props) {
       <button className="btn btn-primary" onClick={handleExport} style={{ fontSize: 16, padding: '12px 32px' }}>
         Export to .xlsx
       </button>
+
+      {savedAs && (
+        <div style={{
+          marginTop: 16, padding: '12px 16px', borderRadius: 6,
+          background: 'var(--success-bg, #d4edda)', color: 'var(--success-text, #155724)',
+          border: '1px solid var(--success-border, #c3e6cb)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12
+        }}>
+          <span>✓ Saved to Downloads: <strong>{savedAs}</strong></span>
+          <button onClick={() => setSavedAs(null)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 16, lineHeight: 1 }}>
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 }

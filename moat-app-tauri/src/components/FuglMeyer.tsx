@@ -11,6 +11,10 @@ export default function FuglMeyer({ data, onChange }: Props) {
     onChange({ ...data, scores: { ...data.scores, [itemId]: value } });
   };
 
+  const setSectionNote = (title: string, note: string) => {
+    onChange({ ...data, sectionNotes: { ...data.sectionNotes, [title]: note } });
+  };
+
   const totalScore = Object.values(data.scores).reduce<number>((sum, v) => {
     if (v === null || v === undefined || v < 0) return sum;
     return sum + v;
@@ -48,6 +52,13 @@ export default function FuglMeyer({ data, onChange }: Props) {
               </div>
             );
           })}
+          <input
+            type="text"
+            value={data.sectionNotes?.[section.title] ?? ''}
+            onChange={e => setSectionNote(section.title, e.target.value)}
+            placeholder="Section notes..."
+            style={{ width: '100%', marginTop: 4, fontSize: 12, fontStyle: 'italic' }}
+          />
         </div>
       ))}
     </div>

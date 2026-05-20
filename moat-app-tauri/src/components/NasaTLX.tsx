@@ -6,7 +6,7 @@ interface Props {
   variant: 'without' | 'with';
 }
 
-const dimensions: { key: keyof NasaTLXData; label: string; description: string }[] = [
+const dimensions: { key: keyof Omit<NasaTLXData, 'dimensionNotes'>; label: string; description: string }[] = [
   { key: 'mentalDemand', label: 'Mental Demand', description: 'How much mental and perceptual activity was required?' },
   { key: 'physicalDemand', label: 'Physical Demand', description: 'How much physical activity was required?' },
   { key: 'temporalDemand', label: 'Temporal Demand', description: 'How much time pressure did you feel?' },
@@ -36,6 +36,11 @@ export default function NasaTLX({ data, onChange, variant }: Props) {
             value={data[dim.key] ?? ''}
             onChange={e => onChange({ ...data, [dim.key]: e.target.value ? parseInt(e.target.value) : null })}
             style={{ width: 60 }} />
+          <input type="text"
+            value={data.dimensionNotes?.[dim.key] ?? ''}
+            onChange={e => onChange({ ...data, dimensionNotes: { ...data.dimensionNotes, [dim.key]: e.target.value } })}
+            placeholder="Notes..."
+            style={{ flex: 1, marginLeft: 8 }} />
         </div>
       ))}
     </div>

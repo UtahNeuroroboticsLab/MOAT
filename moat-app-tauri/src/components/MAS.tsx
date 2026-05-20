@@ -28,6 +28,7 @@ export default function MAS({ data, onChange }: Props) {
             <th>MAS Score</th>
             <th>MMT Score</th>
             <th>AROM (degrees)</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -48,6 +49,10 @@ export default function MAS({ data, onChange }: Props) {
               <td>
                 <input type="text" value={row.arom} onChange={e => updateRow(i, 'arom', e.target.value)}
                   placeholder={row.arom === 'NT' ? 'NT' : 'degrees or NA'} />
+              </td>
+              <td>
+                <input type="text" value={row.notes} onChange={e => updateRow(i, 'notes', e.target.value)}
+                  placeholder="Notes..." />
               </td>
             </tr>
           ))}

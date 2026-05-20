@@ -22,6 +22,11 @@ export default function MyomoTasks({ data, onChange, variant }: Props) {
     onChange({ ...data, tasks });
   };
 
+  const updateTaskNotes = (taskIdx: number, notes: string) => {
+    const tasks = data.tasks.map((t, ti) => ti === taskIdx ? { ...t, notes } : t);
+    onChange({ ...data, tasks });
+  };
+
   return (
     <div>
       <h2 className="section-title">Myomo Functional Tasks ({label})</h2>
@@ -71,6 +76,14 @@ export default function MyomoTasks({ data, onChange, variant }: Props) {
                 </tr>
               </tbody>
             </table>
+            <div className="form-group" style={{ marginTop: 8 }}>
+              <input
+                type="text"
+                value={task.notes ?? ''}
+                onChange={e => updateTaskNotes(taskIdx, e.target.value)}
+                placeholder="Task notes..."
+              />
+            </div>
           </div>
         );
       })}
