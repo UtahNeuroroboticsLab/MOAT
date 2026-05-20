@@ -225,6 +225,34 @@ export async function exportAssessment(state: AssessmentState): Promise<any> {
   writeNASASheet('9a_NASA_TLX_WITHOUT_MYOPRO', state.nasaWithout);
   writeNASASheet('9b_NASA_TLX_WITH_MYOPRO', state.nasaWith);
 
+  // ========== NOTES ==========
+  const wNotes = ws('NOTES');
+  if (wNotes) {
+    // Dedicated extra cells
+    sv(wNotes, 'E2', state.sectionNotes['patient_info']);
+    sv(wNotes, 'E8', state.sectionNotes['other']);
+
+    // Rows 2–11: col B = Completed (Yes/No), col C = section notes text
+    const entries: Array<{ row: number; notesKey: string; recordedKey: string | null }> = [
+      { row: 2,  notesKey: 'mas',         recordedKey: null },
+      { row: 3,  notesKey: 'fugl_meyer',  recordedKey: null },
+      { row: 4,  notesKey: 'sis',         recordedKey: null },
+      { row: 5,  notesKey: 'copm',        recordedKey: null },
+      { row: 6,  notesKey: 'myomo_tasks', recordedKey: 'myomo_without' },
+      { row: 7,  notesKey: 'cahai',       recordedKey: 'cahai_without' },
+      { row: 8,  notesKey: 'nasa_tlx',    recordedKey: 'nasa_without' },
+      { row: 9,  notesKey: 'myomo_tasks', recordedKey: null },
+      { row: 10, notesKey: 'cahai',       recordedKey: null },
+      { row: 11, notesKey: 'nasa_tlx',    recordedKey: 'nasa_with' },
+    ];
+
+    for (const entry of entries) {
+      const completed = entry.recordedKey && state.notRecorded[entry.recordedKey] ? 'No' : 'Yes';
+      sv(wNotes, `B${entry.row}`, completed);
+      sv(wNotes, `C${entry.row}`, state.sectionNotes[entry.notesKey]);
+    }
+  }
+
   return wb;
 }
 
