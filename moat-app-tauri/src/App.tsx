@@ -62,9 +62,13 @@ function App() {
   };
 
   return (
-    <div className="app-layout">
+    <div className="app-root">
+      <div className="app-banner">
+        <span>MOAT: Myoelectric Orthosis Assessment Toolkit</span>
+        <span>Leonardo Ferrisi 2026</span>
+      </div>
+      <div className="app-layout">
       <aside className="sidebar">
-        <div className="sidebar-header">MOAT Assessment</div>
         <nav className="sidebar-nav">
           {sections.map((s, i) => (
             <div key={s.id}>
@@ -92,6 +96,7 @@ function App() {
           </button>
         </div>
       </main>
+    </div>
     </div>
   );
 }
