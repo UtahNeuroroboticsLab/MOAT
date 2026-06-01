@@ -18,10 +18,26 @@ Before you begin, ensure you have the following installed:
   npm --version
 
 
+
+
 ### Rust Install
 
 Install Rust using rustup:
 
 ```
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+## Building
+
+### Build single executable
+
+```bash
+bun run tauri build -- --bundles nsis
+```
+
+### Build installer
+
+```bash
+bun run tauri build
 ```
