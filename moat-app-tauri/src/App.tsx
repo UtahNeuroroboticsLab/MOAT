@@ -3,6 +3,7 @@ import './App.css';
 import { SectionId, AssessmentState } from './types';
 import { createDefaultState } from './defaults';
 import { ensureDataDirs, loadPatientData, PatientData } from './utils/tauriCommands';
+import { version } from '../package.json';
 import { exportAssessment, saveWorkbookToDisk } from './utils/exportXlsx';
 import PatientInfo from './components/PatientInfo';
 import MAS from './components/MAS';
@@ -115,7 +116,7 @@ function App() {
     <div className="app-root">
       <div className="app-banner">
         <span>MOAT: Myoelectric Orthosis Assessment Toolkit</span>
-        <span>Leonardo Ferrisi 2026</span>
+        <span>Leonardo Ferrisi 2026 - v{version}</span>
       </div>
       <div className="app-layout">
       <aside className="sidebar">

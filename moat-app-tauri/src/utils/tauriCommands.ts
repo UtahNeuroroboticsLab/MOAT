@@ -18,6 +18,10 @@ export async function saveXlsxBytes(filename: string, bytes: number[]): Promise<
   return invoke('save_xlsx_bytes', { filename, bytes });
 }
 
+export async function openAssessmentsFolder(): Promise<void> {
+  return invoke('open_assessments_folder');
+}
+
 export async function listAssessments(): Promise<string[]> {
   return invoke<string[]>('list_assessments');
 }

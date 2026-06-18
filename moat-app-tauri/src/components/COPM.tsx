@@ -102,6 +102,16 @@ export default function COPM({ data, onChange }: Props) {
           </tr>
         </tbody>
       </table>
+      <div className="form-group" style={{ marginTop: 24 }}>
+        <label className="form-label">Notes</label>
+        <textarea
+          rows={5}
+          value={data.notes}
+          onChange={e => onChange({ ...data, notes: e.target.value })}
+          placeholder="General COPM notes..."
+          style={{ width: '100%', resize: 'vertical' }}
+        />
+      </div>
     </div>
   );
 }

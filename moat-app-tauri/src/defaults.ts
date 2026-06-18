@@ -62,6 +62,7 @@ export function createDefaultState(): AssessmentState {
         leisure: { quietRec: [null, null, null], activeRec: [null, null, null], socialization: [null, null, null] },
       },
       dates: { initial: '', t2: '' },
+      notes: '',
     },
     myomoWithout: {
       tasks: myomoTasks.map(t => ({

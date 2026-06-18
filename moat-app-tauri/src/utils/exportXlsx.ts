@@ -106,6 +106,9 @@ export async function exportAssessment(state: AssessmentState): Promise<any> {
       sv(w3, `${col}16`, total);
       sv(w3, `${col}17`, vals.length > 0 ? Math.round(total / vals.length * 100) / 100 : 0);
     });
+
+    const notesCell = state.patientInfo.assessmentPhase === 'baseline' ? 'B54' : 'B57';
+    sv(w3, notesCell, state.copm.notes);
   }
 
   // ========== 4. Modified Ashworth Scale ==========

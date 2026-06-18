@@ -48,6 +48,7 @@ export interface COPMData {
     leisure: { quietRec: (number|null)[]; activeRec: (number|null)[]; socialization: (number|null)[] };
   };
   dates: { initial: string; t2: string };
+  notes: string;
 }
 
 export interface FMAData {

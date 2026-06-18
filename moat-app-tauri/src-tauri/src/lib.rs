@@ -28,6 +28,17 @@ fn save_xlsx_bytes(filename: String, bytes: Vec<u8>) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn open_assessments_folder() -> Result<(), String> {
+    let path = moat_data_dir()?.join("assessments");
+    fs::create_dir_all(&path).map_err(|e| e.to_string())?;
+    std::process::Command::new("explorer.exe")
+        .arg(path)
+        .spawn()
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
 fn list_assessments() -> Result<Vec<String>, String> {
     let dir = moat_data_dir()?.join("assessments");
     let entries = fs::read_dir(dir).map_err(|e| e.to_string())?;
@@ -70,6 +81,7 @@ pub fn run() {
             ensure_data_dirs,
             save_assessment,
             save_xlsx_bytes,
+            open_assessments_folder,
             list_assessments,
             load_assessment,
             save_patient_data,

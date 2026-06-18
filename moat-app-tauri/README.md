@@ -33,7 +33,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ### Build single executable
 
 ```bash
-bun run tauri build -- --bundles nsis
+bun run tauri build --bundles nsis
 ```
 
 ### Build installer

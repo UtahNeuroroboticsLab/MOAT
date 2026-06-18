@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { openUrl } from '@tauri-apps/plugin-opener';
+import { ensureDataDirs, openAssessmentsFolder } from '../utils/tauriCommands';
 import { AssessmentState } from '../types';
 import { fmaSections } from '../data/fmaItems';
 import { exportAssessment, downloadWorkbook } from '../utils/exportXlsx';
@@ -31,6 +33,31 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
       await onSaveToDisk();
       setDiskSaved(true);
       setTimeout(() => setDiskSaved(false), 3000);
+    } catch (e) {
+      setDiskError(String(e));
+    }
+  };
+
+  const handleOpenFolder = async () => {
+    await openAssessmentsFolder();
+  };
+
+  const handleNotify = async () => {
+    if (!onSaveToDisk) return;
+    setDiskError(null);
+    try {
+      await onSaveToDisk();
+      setDiskSaved(true);
+      setTimeout(() => setDiskSaved(false), 3000);
+
+      const id = state.patientInfo.id || '??';
+      const moatDataPath = await ensureDataDirs();
+      const fullPath = `${moatDataPath}\\assessments\\${xlsxFilename}`;
+      const subject = encodeURIComponent(`[MOAT] P${id} ${phaseLabel} assessment completed`);
+      const body = encodeURIComponent(
+        `Patient ${id} ${phaseLabel} assessment completed\n\nPatient data is saved to:\n${fullPath}`
+      );
+      await openUrl(`mailto:Leonardo.Ferrisi@utah.edu?subject=${subject}&body=${body}`);
     } catch (e) {
       setDiskError(String(e));
     }
@@ -103,11 +130,21 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
 
       <div className="export-btn-row">
         <button type="button" className="btn btn-primary export-btn-xl" onClick={handleExport}>
-          Export to .xlsx
+          Export as .xlsx to Downloads
         </button>
         {onSaveToDisk && (
           <button type="button" className="btn btn-outline export-btn-xl" onClick={handleSaveToDisk}>
-            Save to MOAT_data
+            Save to BOX Drive (MOAT_data/assessments)
+          </button>
+        )}
+        {onSaveToDisk && (
+          <button type="button" className="btn btn-outline export-btn-xl" onClick={handleNotify}>
+            Notify Leonardo
+          </button>
+        )}
+        {onSaveToDisk && (
+          <button type="button" className="btn btn-outline export-btn-xl" onClick={handleOpenFolder}>
+            Open Save Folder
           </button>
         )}
       </div>
