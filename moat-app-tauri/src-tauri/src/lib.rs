@@ -22,6 +22,12 @@ fn save_assessment(filename: String, json: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn save_xlsx_bytes(filename: String, bytes: Vec<u8>) -> Result<(), String> {
+    let path = moat_data_dir()?.join("assessments").join(&filename);
+    fs::write(path, bytes).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 fn list_assessments() -> Result<Vec<String>, String> {
     let dir = moat_data_dir()?.join("assessments");
     let entries = fs::read_dir(dir).map_err(|e| e.to_string())?;
@@ -63,6 +69,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             ensure_data_dirs,
             save_assessment,
+            save_xlsx_bytes,
             list_assessments,
             load_assessment,
             save_patient_data,

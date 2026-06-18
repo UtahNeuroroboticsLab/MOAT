@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { SectionId, AssessmentState } from './types';
 import { createDefaultState } from './defaults';
-import { ensureDataDirs, saveAssessment, savePatientData, loadPatientData, PatientData } from './utils/tauriCommands';
+import { ensureDataDirs, loadPatientData, PatientData } from './utils/tauriCommands';
+import { exportAssessment, saveWorkbookToDisk } from './utils/exportXlsx';
 import PatientInfo from './components/PatientInfo';
 import MAS from './components/MAS';
 import FuglMeyer from './components/FuglMeyer';
@@ -78,26 +79,13 @@ function App() {
   };
 
   const handleSaveToDisk = async (): Promise<void> => {
-    const { id, assessmentPhase, date } = state.patientInfo;
-    const patientId = id.trim() || 'unknown';
-    const dateStr = date || new Date().toISOString().slice(0, 10);
-    const phase = assessmentPhase === 'baseline' ? 'baseline' : assessmentPhase;
-    const filename = `${patientId}_${phase}_${dateStr}.json`;
+    const phaseLabel = state.patientInfo.assessmentPhase === 'baseline'
+      ? 'baseline'
+      : `phase${state.patientInfo.assessmentPhase.replace('m', '').replace('y', '12')}`;
+    const filename = `${state.patientInfo.id || '??'}__${phaseLabel}_assessment.xlsx`;
 
-    await saveAssessment(filename, JSON.stringify(state, null, 2));
-
-    if (patientId !== 'unknown') {
-      const copmProblems = state.copm.problems
-        .filter(p => p.description.trim() !== '')
-        .map(p => ({ description: p.description, importance: p.importance }));
-      if (copmProblems.length > 0) {
-        await savePatientData(patientId, {
-          patientId,
-          lastUpdated: dateStr,
-          copmProblems,
-        });
-      }
-    }
+    const wb = await exportAssessment(state);
+    await saveWorkbookToDisk(wb, filename);
   };
 
   const sectionIdx = sections.findIndex(s => s.id === activeSection);

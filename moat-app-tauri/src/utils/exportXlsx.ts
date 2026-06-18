@@ -271,3 +271,12 @@ export async function downloadWorkbook(wb: unknown, filename: string): Promise<v
   URL.revokeObjectURL(url);
 }
 
+export async function saveWorkbookToDisk(wb: unknown, filename: string): Promise<void> {
+  const { saveXlsxBytes } = await import('../utils/tauriCommands');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = await (wb as any).outputAsync() as ArrayBuffer;
+  const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const arrayBuffer = await blob.arrayBuffer();
+  await saveXlsxBytes(filename, Array.from(new Uint8Array(arrayBuffer)));
+}
+

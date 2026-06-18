@@ -14,6 +14,10 @@ export async function saveAssessment(filename: string, json: string): Promise<vo
   return invoke('save_assessment', { filename, json });
 }
 
+export async function saveXlsxBytes(filename: string, bytes: number[]): Promise<void> {
+  return invoke('save_xlsx_bytes', { filename, bytes });
+}
+
 export async function listAssessments(): Promise<string[]> {
   return invoke<string[]>('list_assessments');
 }
