@@ -1,30 +1,41 @@
 import { useState } from 'react';
 import { AssessmentState } from '../types';
-import { sisDomains } from '../data/sisItems';
 import { fmaSections } from '../data/fmaItems';
 import { exportAssessment, downloadWorkbook } from '../utils/exportXlsx';
 
 interface Props {
   state: AssessmentState;
+  onSaveToDisk?: () => Promise<void>;
 }
 
-function countFilled(obj: Record<string, unknown>): number {
-  return Object.values(obj).filter(v => v !== null && v !== undefined && v !== '').length;
-}
+export default function ExportSection({ state, onSaveToDisk }: Props) {
+  const [xlsxSavedAs, setXlsxSavedAs] = useState<string | null>(null);
+  const [diskSaved, setDiskSaved] = useState(false);
+  const [diskError, setDiskError] = useState<string | null>(null);
 
-export default function ExportSection({ state }: Props) {
-  const [savedAs, setSavedAs] = useState<string | null>(null);
+  const phaseLabel = state.patientInfo.assessmentPhase === 'baseline'
+    ? 'baseline'
+    : `phase${state.patientInfo.assessmentPhase.replace('m', '').replace('y', '12')}`;
+  const xlsxFilename = `${state.patientInfo.id || '??'}__${phaseLabel}_assessment.xlsx`;
 
   const handleExport = async () => {
-    const phase = state.patientInfo.assessmentPhase;
-    const id = state.patientInfo.id || 'unknown';
-    const filename = `${id}__${phase === 'baseline' ? 'baseline' : `phase${phase.replace('m', '').replace('y', '12')}`}_assessment.xlsx`;
     const wb = await exportAssessment(state);
-    await downloadWorkbook(wb, filename);
-    setSavedAs(filename);
+    await downloadWorkbook(wb, xlsxFilename);
+    setXlsxSavedAs(xlsxFilename);
   };
 
-  // Completion checks
+  const handleSaveToDisk = async () => {
+    if (!onSaveToDisk) return;
+    setDiskError(null);
+    try {
+      await onSaveToDisk();
+      setDiskSaved(true);
+      setTimeout(() => setDiskSaved(false), 3000);
+    } catch (e) {
+      setDiskError(String(e));
+    }
+  };
+
   const checks = [
     {
       label: 'Patient Info',
@@ -52,7 +63,7 @@ export default function ExportSection({ state }: Props) {
     },
     {
       label: 'CAHAI (W/O)',
-      done: state.cahaiWithout.tasks.some(t => t.score > 1),
+      done: state.cahaiWithout.tasks.some(t => t.score !== null && t.score > 0),
     },
     {
       label: 'NASA TLX (W/O)',
@@ -67,12 +78,10 @@ export default function ExportSection({ state }: Props) {
   return (
     <div className="export-section">
       <h2 className="section-title">Export Assessment</h2>
-      <p className="section-subtitle">
-        Generate .xlsx file compatible with mapping.json parser
-      </p>
+      <p className="section-subtitle">Generate .xlsx file compatible with mapping.json parser</p>
 
       <div className="export-summary">
-        <div style={{ fontWeight: 600, marginBottom: 12, fontSize: 14 }}>Completion Summary</div>
+        <div className="export-summary-header">Completion Summary</div>
         {checks.map(c => (
           <div className="export-row" key={c.label}>
             <span>{c.label}</span>
@@ -81,37 +90,46 @@ export default function ExportSection({ state }: Props) {
             </span>
           </div>
         ))}
-        <div className="export-row" style={{ marginTop: 8, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+        <div className="export-row export-fma-row">
           <span>FMA Score</span>
           <span>{fmaFilled}/{fmaItems} items → <strong>{fmaTotal}/66</strong></span>
         </div>
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      <div className="export-filename-row">
         <strong>Output filename:</strong>{' '}
-        <code style={{ background: 'var(--bg-alt)', padding: '2px 6px', borderRadius: 4 }}>
-          {state.patientInfo.id || '??'}__
-          {state.patientInfo.assessmentPhase === 'baseline' ? 'baseline' : `phase${state.patientInfo.assessmentPhase.replace('m', '').replace('y', '12')}`}
-          _assessment.xlsx
-        </code>
+        <code className="export-filename-code">{xlsxFilename}</code>
       </div>
 
-      <button className="btn btn-primary" onClick={handleExport} style={{ fontSize: 16, padding: '12px 32px' }}>
-        Export to .xlsx
-      </button>
-
-      {savedAs && (
-        <div style={{
-          marginTop: 16, padding: '12px 16px', borderRadius: 6,
-          background: 'var(--success-bg, #d4edda)', color: 'var(--success-text, #155724)',
-          border: '1px solid var(--success-border, #c3e6cb)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12
-        }}>
-          <span>✓ Saved to Downloads: <strong>{savedAs}</strong></span>
-          <button onClick={() => setSavedAs(null)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 16, lineHeight: 1 }}>
-            ×
+      <div className="export-btn-row">
+        <button type="button" className="btn btn-primary export-btn-xl" onClick={handleExport}>
+          Export to .xlsx
+        </button>
+        {onSaveToDisk && (
+          <button type="button" className="btn btn-outline export-btn-xl" onClick={handleSaveToDisk}>
+            Save to MOAT_data
           </button>
+        )}
+      </div>
+
+      {xlsxSavedAs && (
+        <div className="export-toast export-toast-success">
+          <span>✓ Saved to Downloads: <strong>{xlsxSavedAs}</strong></span>
+          <button type="button" className="export-toast-dismiss" onClick={() => setXlsxSavedAs(null)}>×</button>
+        </div>
+      )}
+
+      {diskSaved && (
+        <div className="export-toast export-toast-success">
+          <span>✓ Saved to MOAT_data/assessments</span>
+          <button type="button" className="export-toast-dismiss" onClick={() => setDiskSaved(false)}>×</button>
+        </div>
+      )}
+
+      {diskError && (
+        <div className="export-toast export-toast-error">
+          <span>Error saving: {diskError}</span>
+          <button type="button" className="export-toast-dismiss" onClick={() => setDiskError(null)}>×</button>
         </div>
       )}
     </div>

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { SectionId, AssessmentState } from './types';
 import { createDefaultState } from './defaults';
+import { ensureDataDirs, saveAssessment, savePatientData, loadPatientData, PatientData } from './utils/tauriCommands';
 import PatientInfo from './components/PatientInfo';
 import MAS from './components/MAS';
 import FuglMeyer from './components/FuglMeyer';
@@ -33,9 +34,70 @@ const sections: { id: SectionId; label: string; group?: string }[] = [
 function App() {
   const [state, setState] = useState<AssessmentState>(createDefaultState);
   const [activeSection, setActiveSection] = useState<SectionId>('patient_info');
+  const [foundPatientData, setFoundPatientData] = useState<PatientData | null>(null);
+  const [showAutofillBanner, setShowAutofillBanner] = useState(false);
+  const lastLoadedId = useRef<string>('');
+
+  // Create MOAT_data dirs on startup
+  useEffect(() => {
+    ensureDataDirs().catch(err => console.warn('MOAT_data init failed:', err));
+  }, []);
+
+  // When patient ID changes, check for existing patient data
+  useEffect(() => {
+    const id = state.patientInfo.id.trim();
+    if (!id || id === lastLoadedId.current) return;
+    lastLoadedId.current = id;
+
+    loadPatientData(id)
+      .then(data => {
+        if (!data) return;
+        setFoundPatientData(data);
+        const hasCopmData = data.copmProblems.some(p => p.description.trim() !== '');
+        const copmIsEmpty = !state.copm.problems.some(p => p.description.trim() !== '');
+        if (hasCopmData && copmIsEmpty) {
+          setShowAutofillBanner(true);
+        }
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.patientInfo.id]);
 
   const update = <K extends keyof AssessmentState>(key: K, value: AssessmentState[K]) => {
     setState(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleLoadCopmFromPatientData = () => {
+    if (!foundPatientData) return;
+    const newProblems = state.copm.problems.map((existing, i) => {
+      const saved = foundPatientData.copmProblems[i];
+      return saved ? { ...existing, description: saved.description, importance: saved.importance } : existing;
+    });
+    update('copm', { ...state.copm, problems: newProblems });
+    setShowAutofillBanner(false);
+  };
+
+  const handleSaveToDisk = async (): Promise<void> => {
+    const { id, assessmentPhase, date } = state.patientInfo;
+    const patientId = id.trim() || 'unknown';
+    const dateStr = date || new Date().toISOString().slice(0, 10);
+    const phase = assessmentPhase === 'baseline' ? 'baseline' : assessmentPhase;
+    const filename = `${patientId}_${phase}_${dateStr}.json`;
+
+    await saveAssessment(filename, JSON.stringify(state, null, 2));
+
+    if (patientId !== 'unknown') {
+      const copmProblems = state.copm.problems
+        .filter(p => p.description.trim() !== '')
+        .map(p => ({ description: p.description, importance: p.importance }));
+      if (copmProblems.length > 0) {
+        await savePatientData(patientId, {
+          patientId,
+          lastUpdated: dateStr,
+          copmProblems,
+        });
+      }
+    }
   };
 
   const sectionIdx = sections.findIndex(s => s.id === activeSection);
@@ -57,7 +119,7 @@ function App() {
       case 'nasa_without': return <NasaTLX data={state.nasaWithout} onChange={d => update('nasaWithout', d)} variant="without" />;
       case 'nasa_with': return <NasaTLX data={state.nasaWith} onChange={d => update('nasaWith', d)} variant="with" />;
       case 'notes': return <Notes notes={state.sectionNotes} onChange={n => update('sectionNotes', n)} notRecorded={state.notRecorded} onNotRecordedChange={v => update('notRecorded', v)} />;
-      case 'export': return <ExportSection state={state} />;
+      case 'export': return <ExportSection state={state} onSaveToDisk={handleSaveToDisk} />;
     }
   };
 
@@ -70,7 +132,7 @@ function App() {
       <div className="app-layout">
       <aside className="sidebar">
         <nav className="sidebar-nav">
-          {sections.map((s, i) => (
+          {sections.map((s) => (
             <div key={s.id}>
               {s.group && (
                 <div className="sidebar-group">{s.group}</div>
@@ -86,6 +148,21 @@ function App() {
       </aside>
 
       <main className="main-content">
+        {showAutofillBanner && (
+          <div className="autofill-banner">
+            <span>
+              Previous COPM data found for <strong>{state.patientInfo.id}</strong>.
+            </span>
+            <div className="autofill-banner-actions">
+              <button type="button" className="btn btn-primary autofill-btn" onClick={handleLoadCopmFromPatientData}>
+                Load previous COPM problems
+              </button>
+              <button type="button" className="btn btn-outline autofill-btn" onClick={() => setShowAutofillBanner(false)}>
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
         {renderSection()}
         <div className="nav-footer">
           <button className="btn btn-outline" onClick={goPrev} disabled={sectionIdx === 0}>
