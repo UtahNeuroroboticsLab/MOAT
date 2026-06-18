@@ -76,11 +76,11 @@ export function createDefaultState(): AssessmentState {
       })),
     },
     cahaiWithout: {
-      tasks: cahaiTasks.map(t => ({ role: t.defaultRole, score: 1, comment: '' })),
+      tasks: cahaiTasks.map(t => ({ role: t.defaultRole, score: null, comment: '' })),
       generalComment: '',
     },
     cahaiWith: {
-      tasks: cahaiTasks.map(t => ({ role: t.defaultRole, score: 1, comment: '' })),
+      tasks: cahaiTasks.map(t => ({ role: t.defaultRole, score: null, comment: '' })),
       generalComment: '',
     },
     nasaWithout: { mentalDemand: null, physicalDemand: null, temporalDemand: null, performance: null, effort: null, frustration: null, dimensionNotes: {} },

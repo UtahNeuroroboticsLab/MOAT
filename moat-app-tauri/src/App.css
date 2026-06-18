@@ -465,6 +465,16 @@ textarea { resize: vertical; min-height: 60px; }
   font-style: italic;
 }
 
+.cahai-row-unfilled {
+  background: var(--bg-alt);
+  color: var(--text-muted);
+}
+
+.cahai-score-unfilled {
+  background: var(--border);
+  color: var(--text-muted);
+}
+
 /* ---- Navigation ---- */
 .nav-footer {
   display: flex;

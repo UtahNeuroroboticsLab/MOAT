@@ -10,20 +10,21 @@ interface Props {
 export default function CAHAI({ data, onChange, variant }: Props) {
   const label = variant === 'without' ? 'WITHOUT MyoPro' : 'WITH MyoPro';
 
-  const updateTask = (idx: number, field: keyof CAHAIData['tasks'][0], value: string | number) => {
+  const updateTask = (idx: number, field: keyof CAHAIData['tasks'][0], value: string | number | null) => {
     const tasks = [...data.tasks];
     tasks[idx] = { ...tasks[idx], [field]: value };
     onChange({ ...data, tasks });
   };
 
-  const totalScore = data.tasks.reduce((s, t) => s + t.score, 0);
+  const totalScore = data.tasks.reduce((s, t) => s + (t.score ?? 0), 0);
+  const scoredCount = data.tasks.filter(t => t.score !== null).length;
 
   return (
     <div>
       <h2 className="section-title">CAHAI-13 ({label})</h2>
       <p className="section-subtitle">
         Chedoke Arm and Hand Activity Inventory
-        <span className="score-badge" style={{ marginLeft: 8 }}>Total: {totalScore} / 91</span>
+        <span className="score-badge" style={{ marginLeft: 8 }}>Total: {scoredCount > 0 ? `${totalScore} / ${scoredCount * 7}` : '—'}</span>
       </p>
 
       <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
@@ -43,27 +44,33 @@ export default function CAHAI({ data, onChange, variant }: Props) {
           </tr>
         </thead>
         <tbody>
-          {cahaiTasks.map((taskDef, i) => (
-            <tr key={i}>
-              <td style={{ textAlign: 'center' }}>{taskDef.num}</td>
-              <td>{taskDef.task}</td>
-              <td>
-                <input type="text" value={data.tasks[i].role}
-                  onChange={e => updateTask(i, 'role', e.target.value)}
-                  style={{ fontSize: 12, fontStyle: 'italic', color: 'var(--text-muted)' }} />
-              </td>
-              <td>
-                <select value={data.tasks[i].score}
-                  onChange={e => updateTask(i, 'score', parseInt(e.target.value))}>
-                  {[1, 2, 3, 4, 5, 6, 7].map(v => <option key={v} value={v}>{v}</option>)}
-                </select>
-              </td>
-              <td>
-                <input type="text" value={data.tasks[i].comment}
-                  onChange={e => updateTask(i, 'comment', e.target.value)} />
-              </td>
-            </tr>
-          ))}
+          {cahaiTasks.map((taskDef, i) => {
+            const isUnfilled = data.tasks[i].score === null;
+            return (
+              <tr key={i} className={isUnfilled ? 'cahai-row-unfilled' : undefined}>
+                <td style={{ textAlign: 'center' }}>{taskDef.num}</td>
+                <td>{taskDef.task}</td>
+                <td>
+                  <input type="text" value={data.tasks[i].role}
+                    onChange={e => updateTask(i, 'role', e.target.value)}
+                    className="cahai-role" />
+                </td>
+                <td>
+                  <select
+                    value={data.tasks[i].score ?? ''}
+                    onChange={e => updateTask(i, 'score', e.target.value === '' ? null : parseInt(e.target.value))}
+                    className={isUnfilled ? 'cahai-score-unfilled' : undefined}>
+                    <option value="">—</option>
+                    {[1, 2, 3, 4, 5, 6, 7].map(v => <option key={v} value={v}>{v}</option>)}
+                  </select>
+                </td>
+                <td>
+                  <input type="text" value={data.tasks[i].comment}
+                    onChange={e => updateTask(i, 'comment', e.target.value)} />
+                </td>
+              </tr>
+            );
+          })}
           <tr style={{ fontWeight: 600, background: 'var(--bg-alt)' }}>
             <td colSpan={3} style={{ textAlign: 'right' }}>Total Score:</td>
             <td>{totalScore} / 91</td>

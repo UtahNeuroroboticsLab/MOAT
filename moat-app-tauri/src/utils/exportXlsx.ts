@@ -191,10 +191,11 @@ export async function exportAssessment(state: AssessmentState): Promise<any> {
     let total = 0;
     cahaiTasks.forEach((_, i) => {
       const r = 15 + i;
+      const score = cahaiData.tasks[i].score;
       sv(w, `C${r}`, cahaiData.tasks[i].role);
-      sv(w, `D${r}`, cahaiData.tasks[i].score);
+      if (score !== null) sv(w, `D${r}`, score);
       sv(w, `E${r}`, cahaiData.tasks[i].comment);
-      total += cahaiData.tasks[i].score;
+      total += score ?? 0;
     });
 
     sv(w, 'D29', total);

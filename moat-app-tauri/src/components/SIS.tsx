@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function SIS({ data, onChange }: Props) {
-  const setItem = (domainKey: string, idx: number, value: number) => {
+  const setItem = (domainKey: string, idx: number, value: number | null) => {
     const domains = { ...data.domains };
     const arr = [...domains[domainKey]];
     arr[idx] = value;
@@ -55,7 +55,7 @@ export default function SIS({ data, onChange }: Props) {
                 {[5, 4, 3, 2, 1].map(v => (
                   <button key={v}
                     className={`likert-option ${data.domains[domain.key][idx] === v ? 'selected' : ''}`}
-                    onClick={() => setItem(domain.key, idx, v)}>
+                    onClick={() => setItem(domain.key, idx, data.domains[domain.key][idx] === v ? null : v)}>
                     {v}
                   </button>
                 ))}

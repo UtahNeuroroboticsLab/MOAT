@@ -10,7 +10,7 @@ export const cahaiTasks = [
   { num: 9, task: 'Cut medium resistance putty', defaultRole: 'holds fork' },
   { num: 10, task: 'Zip up the zipper', defaultRole: 'holds zipper pull' },
   { num: 11, task: 'Clean a pair of eyeglasses', defaultRole: 'holds glasses' },
-  { num: 12, task: 'Place container on table', defaultRole: 'Unilateral Task' },
+  { num: 12, task: 'Place container on table', defaultRole: 'Bilateral Task' },
   { num: 13, task: 'Carry bag upstairs', defaultRole: 'Unilateral Task' },
 ];
 

@@ -70,7 +70,7 @@ export interface MyomoTasksData {
 
 export interface CAHAITask {
   role: string;
-  score: number;  // 1-7
+  score: number | null;  // 1-7, null = not recorded
   comment: string;
 }
 
