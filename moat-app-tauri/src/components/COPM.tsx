@@ -1,5 +1,7 @@
+import { useState } from 'react';
+import { openPath } from '@tauri-apps/plugin-opener';
 import { COPMData } from '../types';
-import { downloadCopmPdf } from '../utils/exportCopmPdf';
+import { downloadCopmPdf, saveCopmPdfToDisk } from '../utils/exportCopmPdf';
 
 interface Props {
   data: COPMData;
@@ -83,9 +85,20 @@ export default function COPM({ data, onChange, participantId }: Props) {
   const importanceFor = (group: string, category: string): (number | null)[] =>
     (data.importanceRatings as any)[group][category];
 
-  const handleExportPdf = () => {
+  const [pdfToast, setPdfToast] = useState<{ msg: string; kind: 'success' | 'error' } | null>(null);
+
+  const handleExportPdf = async () => {
     const fname = `COPM_${participantId || 'participant'}.pdf`;
-    downloadCopmPdf(data, fname, { participantId });
+    try {
+      const path = await saveCopmPdfToDisk(data, fname, { participantId });
+      setPdfToast({ msg: `Saved to ${path}`, kind: 'success' });
+      // Auto-open the saved PDF in the system default viewer (best-effort).
+      try { await openPath(path); } catch { /* opening is non-critical */ }
+    } catch {
+      // Not running under Tauri (e.g. browser dev) — fall back to a normal download.
+      downloadCopmPdf(data, fname, { participantId });
+      setPdfToast({ msg: `Downloaded ${fname} to your Downloads folder`, kind: 'success' });
+    }
   };
 
   return (
@@ -99,6 +112,13 @@ export default function COPM({ data, onChange, participantId }: Props) {
           Download COPM PDF
         </button>
       </div>
+
+      {pdfToast && (
+        <div className={`export-toast export-toast-${pdfToast.kind === 'error' ? 'error' : 'success'}`}>
+          <span>{pdfToast.kind === 'error' ? '' : '✓ '}{pdfToast.msg}</span>
+          <button type="button" className="export-toast-dismiss" onClick={() => setPdfToast(null)}>×</button>
+        </div>
+      )}
 
       <div className="form-row" style={{ marginBottom: 20 }}>
         <div className="form-group flex-1">

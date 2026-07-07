@@ -257,10 +257,33 @@ export function generateCopmPdf(copm: COPMData, opts: CopmPdfOptions = {}): jsPD
 }
 
 /**
- * Generate and trigger a browser/Tauri download of the COPM PDF.
+ * Generate and trigger a browser download of the COPM PDF (goes to Downloads).
  * Mirrors the blob-download pattern used by exportXlsx.downloadWorkbook.
  */
 export function downloadCopmPdf(copm: COPMData, filename: string, opts: CopmPdfOptions = {}): void {
   const doc = generateCopmPdf(copm, opts);
   doc.save(filename.endsWith('.pdf') ? filename : `${filename}.pdf`);
+}
+
+/**
+ * Save the COPM PDF to disk under MOAT_data/assessments (via the Tauri backend)
+ * and return the absolute path it was written to.
+ *
+ * Reuses the generic `save_xlsx_bytes` command, which writes raw bytes to
+ * MOAT_data/assessments/<filename> regardless of extension.
+ */
+export async function saveCopmPdfToDisk(
+  copm: COPMData,
+  filename: string,
+  opts: CopmPdfOptions = {},
+): Promise<string> {
+  const doc = generateCopmPdf(copm, opts);
+  const fname = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;
+  const ab = doc.output('arraybuffer') as ArrayBuffer;
+  const bytes = Array.from(new Uint8Array(ab));
+
+  const { saveXlsxBytes, ensureDataDirs } = await import('./tauriCommands');
+  await saveXlsxBytes(fname, bytes);
+  const base = await ensureDataDirs();
+  return `${base}\\assessments\\${fname}`;
 }
