@@ -99,7 +99,7 @@ function App() {
       case 'mas': return <MAS data={state.mas} onChange={d => update('mas', d)} />;
       case 'fugl_meyer': return <FuglMeyer data={state.fma} onChange={d => update('fma', d)} />;
       case 'sis': return <SIS data={state.sis} onChange={d => update('sis', d)} />;
-      case 'copm': return <COPM data={state.copm} onChange={d => update('copm', d)} />;
+      case 'copm': return <COPM data={state.copm} onChange={d => update('copm', d)} participantId={state.patientInfo.id} />;
       // case 'box_and_blocks': return <BoxAndBlocks data={state.boxAndBlocks} onChange={d => update('boxAndBlocks', d)} affectedHand={state.patientInfo.affectedHand} />;
       case 'myomo_without': return <MyomoTasks data={state.myomoWithout} onChange={d => update('myomoWithout', d)} variant="without" />;
       case 'myomo_with': return <MyomoTasks data={state.myomoWith} onChange={d => update('myomoWith', d)} variant="with" />;
