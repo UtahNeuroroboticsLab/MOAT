@@ -58,9 +58,10 @@ fn load_assessment(filename: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-fn save_patient_data(patient_id: String, json: String) -> Result<(), String> {
+fn save_patient_data(patient_id: String, json: String) -> Result<String, String> {
     let path = moat_data_dir()?.join("patient_data").join(format!("{}.json", patient_id));
-    fs::write(path, json).map_err(|e| e.to_string())
+    fs::write(&path, json).map_err(|e| e.to_string())?;
+    Ok(path.to_string_lossy().to_string())
 }
 
 #[tauri::command]

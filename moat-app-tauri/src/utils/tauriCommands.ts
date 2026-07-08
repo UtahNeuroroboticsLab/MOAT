@@ -1,9 +1,19 @@
 import { invoke } from '@tauri-apps/api/core';
+import { COPMData } from '../types';
 
 export interface PatientData {
   patientId: string;
   lastUpdated: string;
-  copmProblems: { description: string; importance: number | null }[];
+  copmProblems: {
+    description: string;
+    importance: number | null;
+    perfT1: number | null;
+    satT1: number | null;
+    notes: string;
+    progression: { phase: string; date: string; perfT2: number | null; satT2: number | null }[];
+  }[];
+  identificationNotes: COPMData['identificationNotes'];
+  importanceRatings: COPMData['importanceRatings'];
 }
 
 export async function ensureDataDirs(): Promise<string> {
@@ -30,8 +40,8 @@ export async function loadAssessment(filename: string): Promise<string> {
   return invoke<string>('load_assessment', { filename });
 }
 
-export async function savePatientData(patientId: string, data: PatientData): Promise<void> {
-  return invoke('save_patient_data', { patientId, json: JSON.stringify(data, null, 2) });
+export async function savePatientData(patientId: string, data: PatientData): Promise<string> {
+  return invoke<string>('save_patient_data', { patientId, json: JSON.stringify(data, null, 2) });
 }
 
 export async function loadPatientData(patientId: string): Promise<PatientData | null> {

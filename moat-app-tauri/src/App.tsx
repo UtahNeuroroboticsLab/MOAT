@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { SectionId, AssessmentState } from './types';
 import { createDefaultState } from './defaults';
-import { ensureDataDirs, loadPatientData, PatientData } from './utils/tauriCommands';
+import { ensureDataDirs, loadPatientData, savePatientData, PatientData } from './utils/tauriCommands';
 import { version } from '../package.json';
 import { exportAssessment, saveWorkbookToDisk } from './utils/exportXlsx';
 import PatientInfo from './components/PatientInfo';
@@ -38,6 +38,7 @@ function App() {
   const [activeSection, setActiveSection] = useState<SectionId>('patient_info');
   const [foundPatientData, setFoundPatientData] = useState<PatientData | null>(null);
   const [showAutofillBanner, setShowAutofillBanner] = useState(false);
+  const [lastAutosave, setLastAutosave] = useState<{ id: string; phase: string; path: string } | null>(null);
   const lastLoadedId = useRef<string>('');
 
   // Create MOAT_data dirs on startup
@@ -65,6 +66,47 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.patientInfo.id]);
 
+  // Auto-save COPM goals per patient ID, debounced.
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    const id = state.patientInfo.id.trim();
+    if (!id) return;
+
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      const phase = state.patientInfo.assessmentPhase;
+      const isBaseline = phase === 'baseline';
+      const date = state.patientInfo.date2 || state.patientInfo.date;
+
+      const copmProblems = state.copm.problems.map((p, i) => {
+        const prevSaved = foundPatientData?.copmProblems[i];
+        const perfT1 = isBaseline ? p.perfT1 : (prevSaved?.perfT1 ?? p.perfT1);
+        const satT1 = isBaseline ? p.satT1 : (prevSaved?.satT1 ?? p.satT1);
+        const progression = (prevSaved?.progression ?? []).filter(entry => entry.phase !== phase);
+        progression.push({ phase, date, perfT2: p.perfT2, satT2: p.satT2 });
+        return { description: p.description, importance: p.importance, perfT1, satT1, notes: p.notes, progression };
+      });
+
+      const payload: PatientData = {
+        patientId: id,
+        lastUpdated: new Date().toISOString(),
+        copmProblems,
+        identificationNotes: state.copm.identificationNotes,
+        importanceRatings: state.copm.importanceRatings,
+      };
+
+      savePatientData(id, payload)
+        .then(path => {
+          setFoundPatientData(payload);
+          setLastAutosave({ id, phase, path });
+        })
+        .catch(err => console.warn('savePatientData failed:', err));
+    }, 800);
+
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.copm, state.patientInfo.id, state.patientInfo.assessmentPhase]);
+
   const update = <K extends keyof AssessmentState>(key: K, value: AssessmentState[K]) => {
     setState(prev => ({ ...prev, [key]: value }));
   };
@@ -73,9 +115,16 @@ function App() {
     if (!foundPatientData) return;
     const newProblems = state.copm.problems.map((existing, i) => {
       const saved = foundPatientData.copmProblems[i];
-      return saved ? { ...existing, description: saved.description, importance: saved.importance } : existing;
+      return saved
+        ? { ...existing, description: saved.description, importance: saved.importance, perfT1: saved.perfT1, satT1: saved.satT1, notes: saved.notes }
+        : existing;
     });
-    update('copm', { ...state.copm, problems: newProblems });
+    update('copm', {
+      ...state.copm,
+      problems: newProblems,
+      identificationNotes: foundPatientData.identificationNotes,
+      importanceRatings: foundPatientData.importanceRatings,
+    });
     setShowAutofillBanner(false);
   };
 
@@ -163,6 +212,11 @@ function App() {
         </div>
       </main>
     </div>
+      {lastAutosave && lastAutosave.id === state.patientInfo.id.trim() && (
+        <div className="autosave-status">
+          Patient #{lastAutosave.id} data for assessment {lastAutosave.phase} autosaved to {lastAutosave.path}
+        </div>
+      )}
     </div>
   );
 }
