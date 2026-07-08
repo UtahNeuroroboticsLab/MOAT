@@ -59,6 +59,7 @@ function App() {
         const hasCopmData = data.copmProblems.some(p => p.description.trim() !== '');
         const copmIsEmpty = !state.copm.problems.some(p => p.description.trim() !== '');
         if (hasCopmData && copmIsEmpty) {
+          applyPatientDataToCopm(data);
           setShowAutofillBanner(true);
         }
       })
@@ -111,21 +112,24 @@ function App() {
     setState(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleLoadCopmFromPatientData = () => {
-    if (!foundPatientData) return;
-    const newProblems = state.copm.problems.map((existing, i) => {
-      const saved = foundPatientData.copmProblems[i];
-      return saved
-        ? { ...existing, description: saved.description, importance: saved.importance, perfT1: saved.perfT1, satT1: saved.satT1, notes: saved.notes }
-        : existing;
+  const applyPatientDataToCopm = (data: PatientData) => {
+    setState(prev => {
+      const newProblems = prev.copm.problems.map((existing, i) => {
+        const saved = data.copmProblems[i];
+        return saved
+          ? { ...existing, description: saved.description, importance: saved.importance, perfT1: saved.perfT1, satT1: saved.satT1, notes: saved.notes }
+          : existing;
+      });
+      return {
+        ...prev,
+        copm: {
+          ...prev.copm,
+          problems: newProblems,
+          identificationNotes: data.identificationNotes,
+          importanceRatings: data.importanceRatings,
+        },
+      };
     });
-    update('copm', {
-      ...state.copm,
-      problems: newProblems,
-      identificationNotes: foundPatientData.identificationNotes,
-      importanceRatings: foundPatientData.importanceRatings,
-    });
-    setShowAutofillBanner(false);
   };
 
   const handleSaveToDisk = async (): Promise<void> => {
@@ -189,12 +193,9 @@ function App() {
         {showAutofillBanner && (
           <div className="autofill-banner">
             <span>
-              Previous COPM data found for <strong>{state.patientInfo.id}</strong>.
+              Previous COPM data for <strong>{state.patientInfo.id}</strong> was loaded automatically.
             </span>
             <div className="autofill-banner-actions">
-              <button type="button" className="btn btn-primary autofill-btn" onClick={handleLoadCopmFromPatientData}>
-                Load previous COPM problems
-              </button>
               <button type="button" className="btn btn-outline autofill-btn" onClick={() => setShowAutofillBanner(false)}>
                 Dismiss
               </button>
