@@ -15,12 +15,12 @@ export function createDefaultState(): AssessmentState {
     mas: {
       rows: [
         { joint: 'Shoulder', muscle: 'Flexors', mas: 'NT', mmt: 'NT', arom: '', notes: '' },
-        { joint: 'Shoulder', muscle: 'Extensors', mas: 'NT', mmt: 'NT', arom: '', notes: '' },
+        // { joint: 'Shoulder', muscle: 'Extensors', mas: 'NT', mmt: 'NT', arom: '', notes: '' },
         { joint: 'Shoulder', muscle: 'Abductors', mas: 'NT', mmt: 'NT', arom: '', notes: '' },
         { joint: 'Elbow', muscle: 'Flexors', mas: '', mmt: '', arom: '', notes: '' },
         { joint: 'Elbow', muscle: 'Extensors', mas: '', mmt: '', arom: '', notes: '' },
-        { joint: 'Wrist', muscle: 'Wrist Flexors', mas: '', mmt: '', arom: '', notes: '' },
-        { joint: 'Wrist', muscle: 'Wrist Extensors', mas: '', mmt: '', arom: '', notes: '' },
+        // { joint: 'Wrist', muscle: 'Wrist Flexors', mas: '', mmt: '', arom: '', notes: '' },
+        // { joint: 'Wrist', muscle: 'Wrist Extensors', mas: '', mmt: '', arom: '', notes: '' },
         { joint: 'Finger', muscle: 'Finger Flexors', mas: '', mmt: 'NT', arom: 'NT', notes: '' },
       ],
     },

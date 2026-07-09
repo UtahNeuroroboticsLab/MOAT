@@ -18,10 +18,11 @@ const sections = [
 ];
 
 const notRecordedOptions = [
-  { key: 'cahai_without', label: 'CAHAI (Without MyoPro)' },
-  { key: 'myomo_without', label: 'Myomo Tasks (Without MyoPro)' },
+  { key: 'mas_mmt_arom', label: 'MAS / MMT / AROM' },
+  { key: 'cahai_without', label: 'CAHAI (With MyoPro)' },
+  { key: 'myomo_without', label: 'Myomo Tasks (With MyoPro)' },
   { key: 'nasa_without', label: 'NASA TLX (Without MyoPro)' },
-  { key: 'nasa_with', label: 'NASA TLX (With MyoPro)' },
+  // { key: 'nasa_with', label: 'NASA TLX (With MyoPro)' },
 ];
 
 export default function Notes({ notes, onChange, notRecorded, onNotRecordedChange }: Props) {

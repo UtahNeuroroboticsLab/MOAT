@@ -35,6 +35,7 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
       setTimeout(() => setDiskSaved(false), 3000);
     } catch (e) {
       setDiskError(String(e));
+      console.log(`disk save error: ${e}`);
     }
   };
 

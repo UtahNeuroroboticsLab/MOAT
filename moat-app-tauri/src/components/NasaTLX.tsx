@@ -15,6 +15,8 @@ const dimensions: { key: keyof Omit<NasaTLXData, 'dimensionNotes'>; label: strin
   { key: 'frustration', label: 'Frustration', description: 'How insecure, discouraged, irritated, stressed, and annoyed were you?' },
 ];
 
+const MAX_VALUE_NASA_TLX = 21;
+
 export default function NasaTLX({ data, onChange, variant }: Props) {
   const label = variant === 'without' ? 'WITHOUT MyoPro' : 'WITH MyoPro';
 
@@ -29,10 +31,10 @@ export default function NasaTLX({ data, onChange, variant }: Props) {
             <div className="slider-label" style={{ fontWeight: 600 }}>{dim.label}</div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{dim.description}</div>
           </div>
-          <input type="range" className="slider-input" min={0} max={20} step={1}
+          <input type="range" className="slider-input" min={0} max={MAX_VALUE_NASA_TLX} step={1}
             value={data[dim.key] ?? 0}
             onChange={e => onChange({ ...data, [dim.key]: parseInt(e.target.value) })} />
-          <input type="number" min={0} max={20}
+          <input type="number" min={0} max={MAX_VALUE_NASA_TLX}
             value={data[dim.key] ?? ''}
             onChange={e => onChange({ ...data, [dim.key]: e.target.value ? parseInt(e.target.value) : null })}
             style={{ width: 60 }} />
