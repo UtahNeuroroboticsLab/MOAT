@@ -24,6 +24,7 @@ const notRecordedOptions = [
   { key: 'nasa_without', label: 'NASA TLX (Without MyoPro)' },
   // { key: 'nasa_with', label: 'NASA TLX (With MyoPro)' },
 ];
+// TODO: fix issue where mas_mmt_arom do not show as skipped in notes
 
 export default function Notes({ notes, onChange, notRecorded, onNotRecordedChange }: Props) {
   return (
