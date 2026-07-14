@@ -1,6 +1,6 @@
 [package]
 name = "moat-app"
-version = "0.1.0"
+version = "0.3.0"
 description = "Myoelectric Orthosis Assessment Toolkit"
 authors = ["Leonardo Ferrisi"]
 edition = "2021"

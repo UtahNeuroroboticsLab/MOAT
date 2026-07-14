@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { openPath } from '@tauri-apps/plugin-opener';
+import { isTauri } from '@tauri-apps/api/core';
 import { COPMData } from '../types';
 import { downloadCopmPdf, saveCopmPdfToDisk } from '../utils/exportCopmPdf';
 
@@ -91,9 +92,15 @@ export default function COPM({ data, onChange, participantId }: Props) {
     const fname = `COPM_${participantId || 'participant'}.pdf`;
     try {
       const path = await saveCopmPdfToDisk(data, fname, { participantId });
-      setPdfToast({ msg: `Saved to ${path}`, kind: 'success' });
-      // Auto-open the saved PDF in the system default viewer (best-effort).
-      try { await openPath(path); } catch { /* opening is non-critical */ }
+      if (isTauri()) {
+        setPdfToast({ msg: `Saved to ${path}`, kind: 'success' });
+        // Auto-open the saved PDF in the system default viewer (best-effort).
+        try { await openPath(path); } catch { /* opening is non-critical */ }
+      } else {
+        // Browser: also trigger a real file download alongside the IndexedDB save.
+        downloadCopmPdf(data, fname, { participantId });
+        setPdfToast({ msg: `Downloaded ${fname} to your Downloads folder`, kind: 'success' });
+      }
     } catch {
       // Not running under Tauri (e.g. browser dev) — fall back to a normal download.
       downloadCopmPdf(data, fname, { participantId });

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { openUrl } from '@tauri-apps/plugin-opener';
+import { isTauri } from '@tauri-apps/api/core';
 import { ensureDataDirs, openAssessmentsFolder } from '../utils/tauriCommands';
 import { AssessmentState } from '../types';
 import { fmaSections } from '../data/fmaItems';
@@ -58,7 +59,12 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
       const body = encodeURIComponent(
         `Patient ${id} ${phaseLabel} assessment completed\n\nPatient data is saved to:\n${fullPath}`
       );
-      await openUrl(`mailto:Leonardo.Ferrisi@utah.edu?subject=${subject}&body=${body}`);
+      const mailtoUrl = `mailto:Leonardo.Ferrisi@utah.edu?subject=${subject}&body=${body}`;
+      if (isTauri()) {
+        await openUrl(mailtoUrl);
+      } else {
+        window.location.href = mailtoUrl;
+      }
     } catch (e) {
       setDiskError(String(e));
     }
