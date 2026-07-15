@@ -45,20 +45,28 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
   };
 
   const handleNotify = async () => {
-    if (!onSaveToDisk) return;
     setDiskError(null);
     try {
-      await onSaveToDisk();
-      setDiskSaved(true);
-      setTimeout(() => setDiskSaved(false), 3000);
-
       const id = state.patientInfo.id || '??';
-      const moatDataPath = await ensureDataDirs();
-      const fullPath = `${moatDataPath}\\assessments\\${xlsxFilename}`;
       const subject = encodeURIComponent(`[MOAT] P${id} ${phaseLabel} assessment completed`);
-      const body = encodeURIComponent(
-        `Patient ${id} ${phaseLabel} assessment completed\n\nPatient data is saved to:\n${fullPath}`
-      );
+
+      let body: string;
+      if (isTauri() && onSaveToDisk) {
+        await onSaveToDisk();
+        setDiskSaved(true);
+        setTimeout(() => setDiskSaved(false), 3000);
+
+        const moatDataPath = await ensureDataDirs();
+        const fullPath = `${moatDataPath}\\assessments\\${xlsxFilename}`;
+        body = encodeURIComponent(
+          `Patient ${id} ${phaseLabel} assessment completed\n\nPatient data is saved to:\n${fullPath}`
+        );
+      } else {
+        body = encodeURIComponent(
+          `Patient ${id} ${phaseLabel} assessment completed\n\nDon't forget to attach the downloaded file: ${xlsxFilename}`
+        );
+      }
+
       const mailtoUrl = `mailto:Leonardo.Ferrisi@utah.edu?subject=${subject}&body=${body}`;
       if (isTauri()) {
         await openUrl(mailtoUrl);

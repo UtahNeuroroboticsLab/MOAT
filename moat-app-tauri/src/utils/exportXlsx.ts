@@ -25,7 +25,7 @@ function formatDate(d: string): string {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function exportAssessment(state: AssessmentState): Promise<any> {
-  const resp = await fetch('/template_assessment.xlsx');
+  const resp = await fetch('template_assessment.xlsx');
   const buf = await resp.arrayBuffer();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const wb: any = await XlsxPopulate.fromDataAsync(buf);
