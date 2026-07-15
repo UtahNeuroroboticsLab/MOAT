@@ -47,6 +47,10 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
   const handleNotify = async () => {
     setDiskError(null);
     try {
+      const wb = await exportAssessment(state);
+      await downloadWorkbook(wb, xlsxFilename);
+      setXlsxSavedAs(xlsxFilename);
+
       const id = state.patientInfo.id || '??';
       const subject = encodeURIComponent(`[MOAT] P${id} ${phaseLabel} assessment completed`);
 
@@ -63,7 +67,7 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
         );
       } else {
         body = encodeURIComponent(
-          `Patient ${id} ${phaseLabel} assessment completed\n\nDon't forget to attach the downloaded file: ${xlsxFilename}`
+          `Patient ${id} ${phaseLabel} assessment completed\n\n${xlsxFilename} was just downloaded — attach it from your Downloads folder.`
         );
       }
 
