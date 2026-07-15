@@ -137,23 +137,23 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
 
       <div className="export-btn-row">
         <button type="button" className="btn btn-primary export-btn-xl" onClick={handleExport}>
-          Export as .xlsx to Downloads
+          Download .xlsx
         </button>
-        {onSaveToDisk && (
+        {/* {onSaveToDisk && (
           <button type="button" className="btn btn-outline export-btn-xl" onClick={handleSaveToDisk}>
             Save to BOX Drive (MOAT_data/assessments)
           </button>
-        )}
+        )} */}
         {onSaveToDisk && (
           <button type="button" className="btn btn-outline export-btn-xl" onClick={handleNotify}>
             Notify Leonardo
           </button>
         )}
-        {onSaveToDisk && (
+        {/* {onSaveToDisk && (
           <button type="button" className="btn btn-outline export-btn-xl" onClick={handleOpenFolder}>
             Open Save Folder
           </button>
-        )}
+        )} */}
       </div>
 
       {xlsxSavedAs && (
