@@ -5,16 +5,25 @@ import { ensureDataDirs, openAssessmentsFolder } from '../utils/tauriCommands';
 import { AssessmentState } from '../types';
 import { fmaSections } from '../data/fmaItems';
 import { exportAssessment, downloadWorkbook } from '../utils/exportXlsx';
+import { isSupabaseConfigured } from '../utils/supabaseClient';
+import { uploadAssessmentToSupabase, notifyAssessmentUploaded, UploadResult } from '../utils/supabaseUpload';
 
 interface Props {
   state: AssessmentState;
   onSaveToDisk?: () => Promise<void>;
 }
 
+type CloudStatus = 'idle' | 'uploading' | 'notifying' | 'success' | 'error';
+
 export default function ExportSection({ state, onSaveToDisk }: Props) {
   const [xlsxSavedAs, setXlsxSavedAs] = useState<string | null>(null);
   const [diskSaved, setDiskSaved] = useState(false);
   const [diskError, setDiskError] = useState<string | null>(null);
+  const [cloudStatus, setCloudStatus] = useState<CloudStatus>('idle');
+  const [cloudResult, setCloudResult] = useState<UploadResult | null>(null);
+  const [showAssessorModal, setShowAssessorModal] = useState(false);
+  const [assessorName, setAssessorName] = useState('');
+  const [customAssessor, setCustomAssessor] = useState('');
 
   const phaseMap: Record<string, string> = {
     baseline: 'baseline',
@@ -75,6 +84,58 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
     }
   };
 
+  const handleBackupClick = () => {
+    setAssessorName('');
+    setCustomAssessor('');
+    setShowAssessorModal(true);
+  };
+
+  const handleAssessorSelect = (name: string) => {
+    setAssessorName(name);
+    if (name !== 'other') setCustomAssessor('');
+  };
+
+  const handleAssessorConfirm = async () => {
+    const finalName = assessorName === 'other' ? customAssessor.trim() : assessorName;
+    setShowAssessorModal(false);
+
+    setCloudStatus('idle');
+    setCloudResult(null);
+    setDiskError(null);
+
+    const wb = await exportAssessment(state, finalName || undefined);
+
+    // Local download always completes first
+    await downloadWorkbook(wb, xlsxFilename);
+    setXlsxSavedAs(xlsxFilename);
+
+    // Save to disk if available
+    if (onSaveToDisk) {
+      try {
+        await onSaveToDisk();
+        setDiskSaved(true);
+        setTimeout(() => setDiskSaved(false), 3000);
+      } catch (e) {
+        setDiskError(String(e));
+      }
+    }
+
+    // Cloud backup
+    setCloudStatus('uploading');
+    const result = await uploadAssessmentToSupabase(wb, xlsxFilename, state.patientInfo.id);
+    setCloudResult(result);
+
+    if (!result.success) {
+      setCloudStatus('error');
+      return;
+    }
+
+    // Email notification via Edge Function
+    setCloudStatus('notifying');
+    await notifyAssessmentUploaded(state.patientInfo.id, phaseLabel, xlsxFilename, finalName || undefined);
+    setCloudStatus('success');
+  };
+
   const checks = [
     {
       label: 'Patient Info',
@@ -114,6 +175,15 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
   const fmaItems = fmaSections.reduce((s, sec) => s + sec.items.length, 0);
   const fmaFilled = Object.values(state.fma.scores).filter(v => v !== null && v !== undefined).length;
 
+  const cloudBusy = cloudStatus === 'uploading' || cloudStatus === 'notifying';
+  const cloudStatusLabel: Record<CloudStatus, string> = {
+    idle: '',
+    uploading: 'Uploading to cloud...',
+    notifying: 'Sending notification...',
+    success: 'Backed up and notified',
+    error: 'Cloud backup failed',
+  };
+
   return (
     <div className="export-section">
       <h2 className="section-title">Export Assessment</h2>
@@ -131,7 +201,7 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
         ))}
         <div className="export-row export-fma-row">
           <span>FMA Score</span>
-          <span>{fmaFilled}/{fmaItems} items → <strong>{fmaTotal}/66</strong></span>
+          <span>{fmaFilled}/{fmaItems} items &rarr; <strong>{fmaTotal}/66</strong></span>
         </div>
       </div>
 
@@ -141,7 +211,21 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
       </div>
 
       <div className="export-btn-row">
-        <button type="button" className="btn btn-primary export-btn-xl" onClick={handleExport}>
+        {isSupabaseConfigured() && (
+          <button
+            type="button"
+            className="btn btn-primary export-btn-xl"
+            onClick={handleBackupClick}
+            disabled={cloudBusy}
+          >
+            {cloudBusy ? cloudStatusLabel[cloudStatus] : 'Export, Backup & Notify'}
+          </button>
+        )}
+        <button
+          type="button"
+          className={`btn ${isSupabaseConfigured() ? 'btn-outline' : 'btn-primary'} export-btn-xl`}
+          onClick={handleExport}
+        >
           Export as .xlsx to Downloads
         </button>
         {onSaveToDisk && (
@@ -151,7 +235,7 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
         )}
         {onSaveToDisk && (
           <button type="button" className="btn btn-outline export-btn-xl" onClick={handleNotify}>
-            Notify Leonardo
+            Notify Leonardo (email client)
           </button>
         )}
         {onSaveToDisk && (
@@ -163,22 +247,90 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
 
       {xlsxSavedAs && (
         <div className="export-toast export-toast-success">
-          <span>✓ Saved to Downloads: <strong>{xlsxSavedAs}</strong></span>
-          <button type="button" className="export-toast-dismiss" onClick={() => setXlsxSavedAs(null)}>×</button>
+          <span>&#10003; Saved to Downloads: <strong>{xlsxSavedAs}</strong></span>
+          <button type="button" className="export-toast-dismiss" onClick={() => setXlsxSavedAs(null)}>&times;</button>
         </div>
       )}
 
       {diskSaved && (
         <div className="export-toast export-toast-success">
-          <span>✓ Saved to MOAT_data/assessments</span>
-          <button type="button" className="export-toast-dismiss" onClick={() => setDiskSaved(false)}>×</button>
+          <span>&#10003; Saved to MOAT_data/assessments</span>
+          <button type="button" className="export-toast-dismiss" onClick={() => setDiskSaved(false)}>&times;</button>
+        </div>
+      )}
+
+      {cloudStatus === 'success' && cloudResult && (
+        <div className="export-toast export-toast-success">
+          <span>&#10003; {cloudResult.message} &mdash; notification sent</span>
+          <button type="button" className="export-toast-dismiss" onClick={() => { setCloudStatus('idle'); setCloudResult(null); }}>&times;</button>
+        </div>
+      )}
+
+      {cloudStatus === 'error' && cloudResult && (
+        <div className="export-toast export-toast-error">
+          <span>Cloud backup: {cloudResult.message}</span>
+          <button type="button" className="export-toast-dismiss" onClick={() => { setCloudStatus('idle'); setCloudResult(null); }}>&times;</button>
         </div>
       )}
 
       {diskError && (
         <div className="export-toast export-toast-error">
           <span>Error saving: {diskError}</span>
-          <button type="button" className="export-toast-dismiss" onClick={() => setDiskError(null)}>×</button>
+          <button type="button" className="export-toast-dismiss" onClick={() => setDiskError(null)}>&times;</button>
+        </div>
+      )}
+
+      {showAssessorModal && (
+        <div className="assessor-modal-overlay" onClick={() => setShowAssessorModal(false)}>
+          <div className="assessor-modal" onClick={e => e.stopPropagation()}>
+            <h3 className="assessor-modal-title">Who are you?</h3>
+            <div className="assessor-modal-options">
+              {['Devyn', 'Leah'].map(name => (
+                <button
+                  key={name}
+                  type="button"
+                  className={`btn assessor-option ${assessorName === name ? 'assessor-option-selected' : 'btn-outline'}`}
+                  onClick={() => handleAssessorSelect(name)}
+                >
+                  {name}
+                </button>
+              ))}
+              <button
+                type="button"
+                className={`btn assessor-option ${assessorName === 'other' ? 'assessor-option-selected' : 'btn-outline'}`}
+                onClick={() => handleAssessorSelect('other')}
+              >
+                Other
+              </button>
+            </div>
+            {assessorName === 'other' && (
+              <input
+                type="text"
+                className="assessor-input"
+                placeholder="Enter your name"
+                value={customAssessor}
+                onChange={e => setCustomAssessor(e.target.value)}
+                autoFocus
+              />
+            )}
+            <div className="assessor-modal-actions">
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setShowAssessorModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleAssessorConfirm}
+                disabled={!assessorName || (assessorName === 'other' && !customAssessor.trim())}
+              >
+                Continue
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -3,3 +3,12 @@ declare module '*.css';
 declare module '*.scss';
 declare module '*.sass';
 declare module '*.less';
+
+interface ImportMetaEnv {
+  readonly VITE_SUPABASE_URL: string;
+  readonly VITE_SUPABASE_PUBLISHABLE_KEY: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}

@@ -24,7 +24,7 @@ function formatDate(d: string): string {
  * (which preserves ALL cell formatting / colors by operating at the ZIP level).
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function exportAssessment(state: AssessmentState): Promise<any> {
+export async function exportAssessment(state: AssessmentState, assessorName?: string): Promise<any> {
   const resp = await fetch('template_assessment.xlsx');
   const buf = await resp.arrayBuffer();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,6 +43,8 @@ export async function exportAssessment(state: AssessmentState): Promise<any> {
     sv(w1, 'B6', state.patientInfo.affectedHand);
     sv(w1, 'B7', state.patientInfo.assessmentPhase);
     sv(w1, 'B11', state.patientInfo.notes);
+    sv(w1, 'D22', 'Assessor');
+    sv(w1, 'D23', assessorName);
   }
 
   // ========== 2. Stroke Impact Scale ==========
