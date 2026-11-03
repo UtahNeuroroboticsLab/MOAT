@@ -133,10 +133,15 @@ function App() {
   };
 
   const handleSaveToDisk = async (): Promise<void> => {
-    const phaseLabel = state.patientInfo.assessmentPhase === 'baseline'
-      ? 'baseline'
-      : `phase${state.patientInfo.assessmentPhase.replace('m', '').replace('y', '12')}`;
-    const filename = `${state.patientInfo.id || '??'}__${phaseLabel}_assessment.xlsx`;
+    const phaseMap: Record<string, string> = {
+      baseline: 'baseline',
+      '2m': 'phase1_2m',
+      '4m': 'phase2_4m',
+      '6m': 'phase3_6m',
+      '1y': 'phase4_12m',
+    };
+    const phaseLabel = phaseMap[state.patientInfo.assessmentPhase] ?? 'baseline';
+    const filename = `${state.patientInfo.id || '??'}_${phaseLabel}_assessment.xlsx`;
 
     const wb = await exportAssessment(state);
     await saveWorkbookToDisk(wb, filename);

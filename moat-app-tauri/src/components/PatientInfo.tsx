@@ -43,7 +43,7 @@ export default function PatientInfo({ data, onChange }: Props) {
         <div className="form-group">
           <label className="form-label">Assessment Phase</label>
           <div className="toggle-row">
-            {(['baseline', '2m', '4m', '6m', '9m', '1y'] as const).map(phase => (
+            {(['baseline', '2m', '4m', '6m', '1y'] as const).map(phase => (
               <button key={phase} className={`toggle-btn ${data.assessmentPhase === phase ? 'active' : ''}`}
                 onClick={() => set('assessmentPhase', phase)}>
                 {phase === 'baseline' ? 'Initial' : phase}
