@@ -3,7 +3,7 @@ export interface PatientInfo {
   date: string;
   date2: string;
   affectedHand: 'Left' | 'Right';
-  assessmentPhase: 'baseline' | '2m' | '4m' | '6m' | '9m' | '1y';
+  assessmentPhase: 'baseline' | '2m' | '4m' | '6m' | '1y';
   notes: string;
 }
 

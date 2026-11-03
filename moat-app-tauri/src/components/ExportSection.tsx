@@ -16,10 +16,15 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
   const [diskSaved, setDiskSaved] = useState(false);
   const [diskError, setDiskError] = useState<string | null>(null);
 
-  const phaseLabel = state.patientInfo.assessmentPhase === 'baseline'
-    ? 'baseline'
-    : `phase${state.patientInfo.assessmentPhase.replace('m', '').replace('y', '12')}`;
-  const xlsxFilename = `${state.patientInfo.id || '??'}__${phaseLabel}_assessment.xlsx`;
+  const phaseMap: Record<string, string> = {
+    baseline: 'baseline',
+    '2m': 'phase1_2m',
+    '4m': 'phase2_4m',
+    '6m': 'phase3_6m',
+    '1y': 'phase4_12m',
+  };
+  const phaseLabel = phaseMap[state.patientInfo.assessmentPhase] ?? 'baseline';
+  const xlsxFilename = `${state.patientInfo.id || '??'}_${phaseLabel}_assessment.xlsx`;
 
   const handleExport = async () => {
     const wb = await exportAssessment(state);
@@ -59,7 +64,7 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
       const body = encodeURIComponent(
         `Patient ${id} ${phaseLabel} assessment completed\n\nPatient data is saved to:\n${fullPath}`
       );
-      const mailtoUrl = `mailto:Leonardo.Ferrisi@utah.edu?subject=${subject}&body=${body}`;
+      const mailtoUrl = `mailto:Leonardo.Ferrisi@utah.edu?cc=caden.hamrick@utah.edu&subject=${subject}&body=${body}`;
       if (isTauri()) {
         await openUrl(mailtoUrl);
       } else {
