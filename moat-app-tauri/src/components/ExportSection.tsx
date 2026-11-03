@@ -50,35 +50,21 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
   };
 
   const handleNotify = async () => {
+    if (!onSaveToDisk) return;
     setDiskError(null);
     try {
-      const wb = await exportAssessment(state);
-      await downloadWorkbook(wb, xlsxFilename);
-      setXlsxSavedAs(xlsxFilename);
+      await onSaveToDisk();
+      setDiskSaved(true);
+      setTimeout(() => setDiskSaved(false), 3000);
 
       const id = state.patientInfo.id || '??';
+      const moatDataPath = await ensureDataDirs();
+      const fullPath = `${moatDataPath}\\assessments\\${xlsxFilename}`;
       const subject = encodeURIComponent(`[MOAT] P${id} ${phaseLabel} assessment completed`);
-      
-
-      let body: string;
-      if (isTauri() && onSaveToDisk) {
-        await onSaveToDisk();
-        setDiskSaved(true);
-        setTimeout(() => setDiskSaved(false), 3000);
-
-        const moatDataPath = await ensureDataDirs();
-        const fullPath = `${moatDataPath}\\assessments\\${xlsxFilename}`;
-        body = encodeURIComponent(
-          `Patient ${id} ${phaseLabel} assessment completed\n\nPatient data is saved to:\n${fullPath}`
-        );
-      } else {
-        const body = encodeURIComponent(
-          `Patient ${id} ${phaseLabel} assessment completed\n\nPatient data is saved to:\n${fullPath}`
-        );
-      }
-      
+      const body = encodeURIComponent(
+        `Patient ${id} ${phaseLabel} assessment completed\n\nPatient data is saved to:\n${fullPath}`
+      );
       const mailtoUrl = `mailto:Leonardo.Ferrisi@utah.edu?cc=caden.hamrick@utah.edu&subject=${subject}&body=${body}`;
-
       if (isTauri()) {
         await openUrl(mailtoUrl);
       } else {
@@ -156,23 +142,23 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
 
       <div className="export-btn-row">
         <button type="button" className="btn btn-primary export-btn-xl" onClick={handleExport}>
-          Download .xlsx
+          Export as .xlsx to Downloads
         </button>
-        {/* {onSaveToDisk && (
+        {onSaveToDisk && (
           <button type="button" className="btn btn-outline export-btn-xl" onClick={handleSaveToDisk}>
             Save to BOX Drive (MOAT_data/assessments)
           </button>
-        )} */}
+        )}
         {onSaveToDisk && (
           <button type="button" className="btn btn-outline export-btn-xl" onClick={handleNotify}>
             Notify Leonardo
           </button>
         )}
-        {/* {onSaveToDisk && (
+        {onSaveToDisk && (
           <button type="button" className="btn btn-outline export-btn-xl" onClick={handleOpenFolder}>
             Open Save Folder
           </button>
-        )} */}
+        )}
       </div>
 
       {xlsxSavedAs && (
