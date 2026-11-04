@@ -56,7 +56,18 @@ export default function MyomoTasks({ data, onChange, variant }: Props) {
                     <td>{compName}</td>
                     <td>
                       <select value={task.components[compIdx].achieve}
-                        onChange={e => updateComponent(taskIdx, compIdx, 'achieve', parseInt(e.target.value))}>
+                        onChange={e => {
+                          const val = parseInt(e.target.value);
+                          const tasks = data.tasks.map((t, ti) => {
+                            if (ti !== taskIdx) return t;
+                            const components = t.components.map((c, ci) => {
+                              if (ci !== compIdx) return c;
+                              return { ...c, achieve: val, time: val === 0 ? 45 : null };
+                            });
+                            return { ...t, components };
+                          });
+                          onChange({ ...data, tasks });
+                        }}>
                         <option value={0}>0</option>
                         <option value={1}>1</option>
                       </select>

@@ -66,13 +66,13 @@ export function createDefaultState(): AssessmentState {
     },
     myomoWithout: {
       tasks: myomoTasks.map(t => ({
-        components: t.components.map(() => ({ achieve: 0, time: null })),
+        components: t.components.map(() => ({ achieve: 0, time: 45 })),
         notes: '',
       })),
     },
     myomoWith: {
       tasks: myomoTasks.map(t => ({
-        components: t.components.map(() => ({ achieve: 0, time: null })),
+        components: t.components.map(() => ({ achieve: 0, time: 45 })),
         notes: '',
       })),
     },
