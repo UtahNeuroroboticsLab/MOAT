@@ -135,10 +135,10 @@ function App() {
   const handleSaveToDisk = async (): Promise<void> => {
     const phaseMap: Record<string, string> = {
       baseline: 'baseline',
-      '2m': 'phase1_2m',
-      '4m': 'phase2_4m',
-      '6m': 'phase3_6m',
-      '1y': 'phase4_12m',
+      '2m': 'phase1_2mo',
+      '4m': 'phase2_4mo',
+      '6m': 'phase3_6mo',
+      '1y': 'phase4_12mo',
     };
     const phaseLabel = phaseMap[state.patientInfo.assessmentPhase] ?? 'baseline';
     const filename = `${state.patientInfo.id || '??'}_${phaseLabel}_assessment.xlsx`;
