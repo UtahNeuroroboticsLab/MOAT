@@ -1,0 +1,41 @@
+.scan-export {
+  --scan-ink: #0a0a0a;
+  --scan-paper: #fff;
+  --scan-muted: #5a5a5a;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #c7c7c7;
+  color: var(--scan-ink);
+  font-family: Arial, sans-serif;
+}
+.scan-export h3 { font: bold 20px Cambria, serif; margin-bottom: 8px; }
+.scan-export p { max-width: 720px; margin-bottom: 12px; }
+.scan-export label { display: block; margin: 16px 0 4px; }
+.scan-export input {
+  display: block;
+  width: min(100%, 320px);
+  border: 1px solid #c7c7c7;
+  border-radius: 2px;
+  font-family: Arial, sans-serif;
+  background: var(--scan-paper);
+  color: var(--scan-ink);
+  transition: none;
+}
+.scan-export button {
+  margin: 16px 0 12px;
+  padding: 10px 16px;
+  border: 1px solid var(--scan-ink);
+  border-radius: 2px;
+  background: var(--scan-paper);
+  color: var(--scan-ink);
+  font: 14px Arial, sans-serif;
+  cursor: pointer;
+}
+.scan-export button:hover:not(:disabled) { color: var(--scan-paper); background: var(--scan-ink); }
+.scan-export button:disabled { opacity: 0.45; cursor: wait; }
+.scan-export button:focus-visible, .scan-export input:focus-visible { outline: 2px solid var(--scan-ink); outline-offset: 3px; }
+.scan-export .scan-help { color: var(--scan-muted); font-size: 12px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .scan-export { --scan-ink: #fff; --scan-paper: #0a0a0a; --scan-muted: #c7c7c7; background: var(--scan-paper); }
+}
+[data-theme='dark'] .scan-export { --scan-ink: #fff; --scan-paper: #0a0a0a; --scan-muted: #c7c7c7; background: var(--scan-paper); }

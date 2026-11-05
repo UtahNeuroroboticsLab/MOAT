@@ -1,0 +1,82 @@
+{
+  "source": "Assessment Master Packet.pdf",
+  "sha256": "43afe5c503103d0c6325109eb9766458e567a26b0a126a25aaa646cb65475f6e",
+  "dpi": 144,
+  "pages": [
+    {
+      "file": "page-01.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-02.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-03.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-04.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-05.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-06.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-07.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-08.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-09.jpg",
+      "width": 792.0,
+      "height": 612.0
+    },
+    {
+      "file": "page-10.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-11.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-12.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-13.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-14.jpg",
+      "width": 612.0,
+      "height": 792.0
+    },
+    {
+      "file": "page-15.jpg",
+      "width": 612.0,
+      "height": 792.0
+    }
+  ]
+}

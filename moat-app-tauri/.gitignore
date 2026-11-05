@@ -27,3 +27,9 @@ supabase
 *.sw?
 .env
 .venv
+
+# Local document rendering and browser QA
+tmp/
+output/
+.playwright-cli/
+.ref

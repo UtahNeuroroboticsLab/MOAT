@@ -7,6 +7,7 @@ import { fmaSections } from '../data/fmaItems';
 import { exportAssessment, downloadWorkbook } from '../utils/exportXlsx';
 import { isSupabaseConfigured } from '../utils/supabaseClient';
 import { uploadAssessmentToSupabase, notifyAssessmentUploaded, UploadResult } from '../utils/supabaseUpload';
+import './ExportSection.css';
 
 interface Props {
   state: AssessmentState;
@@ -24,6 +25,31 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
   const [showAssessorModal, setShowAssessorModal] = useState(false);
   const [assessorName, setAssessorName] = useState('');
   const [customAssessor, setCustomAssessor] = useState('');
+  const [scanAssessor, setScanAssessor] = useState('');
+  const [scanBusy, setScanBusy] = useState(false);
+  const [scanStatus, setScanStatus] = useState('');
+  const [scanError, setScanError] = useState('');
+
+  const handleScanExport = async () => {
+    setScanBusy(true);
+    setScanError('');
+    setScanStatus('Preparing assessment packet...');
+    try {
+      // Capture the current assessment once, even if data changes during generation.
+      const snapshot = structuredClone(state);
+      const { exportScanPdf, scanFilename } = await import('../utils/exportScanPdf');
+      const pageCount = await exportScanPdf(snapshot, {
+        assessor: scanAssessor,
+        onProgress: (page, total) => setScanStatus(`Generating page ${page} of ${total}...`),
+      });
+      setScanStatus(`Download ready: ${scanFilename(snapshot)} (${pageCount} pages).`);
+    } catch (error) {
+      setScanStatus('');
+      setScanError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setScanBusy(false);
+    }
+  };
 
   const phaseMap: Record<string, string> = {
     baseline: 'baseline',
@@ -279,6 +305,19 @@ export default function ExportSection({ state, onSaveToDisk }: Props) {
           <button type="button" className="export-toast-dismiss" onClick={() => setDiskError(null)}>&times;</button>
         </div>
       )}
+
+      <section className="scan-export" aria-labelledby="scan-export-title" aria-busy={scanBusy}>
+        <h3 id="scan-export-title">Generated scan (experimental)</h3>
+        <p>Fill the original assessment packet with the currently entered data and circle the selected visit, affected hand, and MyoPro condition. Download a scanned-style PDF.</p>
+        <p className="scan-help">Includes all 15 packet pages. Additional SIS responses, notes, and text that does not fit appear in a supplement. Blank fields stay blank; existing default scores are included. Each page is labeled as a generated scan.</p>
+        <label htmlFor="scan-assessor">Assessor name (optional)</label>
+        <input id="scan-assessor" type="text" value={scanAssessor} onChange={event => setScanAssessor(event.target.value)} disabled={scanBusy} />
+        <button type="button" onClick={handleScanExport} disabled={scanBusy}>
+          {scanBusy ? 'Generating scan...' : 'Download generated scan PDF'}
+        </button>
+        <p role="status" aria-live="polite">{scanStatus}</p>
+        {scanError && <p role="alert">Scan export failed: {scanError}</p>}
+      </section>
 
       {showAssessorModal && (
         <div className="assessor-modal-overlay" onClick={() => setShowAssessorModal(false)}>
